@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Snapshot;
 
-
 use App\Domain\Dataset\ExcelDataset;
 use App\Infrastructure\IO\NdjsonWriter;
 use App\Infrastructure\Time\Clock;
@@ -14,8 +13,7 @@ final class DatasetSnapshotWriter
     public function __construct(
         private readonly NdjsonWriter $writer,
         private readonly Clock $clock
-    ) {
-    }
+    ) {}
 
     public function write(ExcelDataset $dataset, string $file): void
     {
@@ -45,6 +43,11 @@ final class DatasetSnapshotWriter
                 foreach ($row as $value) {
 
                     if ($value === null) {
+                        $cleanRow[] = null;
+                        continue;
+                    }
+
+                    if (!is_scalar($value)) {
                         $cleanRow[] = null;
                         continue;
                     }

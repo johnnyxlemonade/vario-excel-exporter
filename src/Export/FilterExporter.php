@@ -11,12 +11,11 @@ class FilterExporter
 {
     public function __construct(
         private readonly FilterExportConfig $config
-    ) {
-    }
+    ) {}
 
     /**
      * @param list<Parameter> $parameters
-     * @param callable(array):void $writeRow
+     * @param callable(list<string|int|float|bool|null>):void $writeRow
      */
     public function export(
         array $parameters,
@@ -34,7 +33,7 @@ class FilterExporter
 
                 $writeRow([
                     $name,
-                    $value
+                    $value,
                 ]);
             }
         }

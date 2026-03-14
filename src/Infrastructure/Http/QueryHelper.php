@@ -6,16 +6,21 @@ namespace App\Infrastructure\Http;
 
 final class QueryHelper
 {
+    /**
+     * @template T of string|null
+     * @param T $default
+     * @return ($default is null ? string|null : string)
+     */
     public static function get(string $key, ?string $default = null): ?string
     {
         $value = $_GET[$key] ?? $default;
 
-        return is_scalar($value) ? (string)$value : $default;
+        return self::scalarToString($value) ?? $default;
     }
 
     public static function has(string $key): bool
     {
-        return isset($_GET[$key]) && is_scalar($_GET[$key]);
+        return self::scalarToString($_GET[$key] ?? null) !== null;
     }
 
     /**
@@ -26,14 +31,20 @@ final class QueryHelper
         $result = [];
 
         foreach ($_GET as $k => $v) {
+            $value = self::scalarToString($v);
 
-            if (!is_scalar($v)) {
+            if ($value === null) {
                 continue;
             }
 
-            $result[(string)$k] = (string)$v;
+            $result[(string) $k] = $value;
         }
 
         return $result;
+    }
+
+    private static function scalarToString(mixed $value): ?string
+    {
+        return is_scalar($value) ? (string) $value : null;
     }
 }

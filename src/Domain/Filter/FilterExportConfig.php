@@ -9,8 +9,7 @@ final class FilterExportConfig
     public function __construct(
         private readonly string $filterColumn = 'filter',
         private readonly string $valueColumn = 'value'
-    ) {
-    }
+    ) {}
 
     /**
      * @return list<string>
@@ -19,7 +18,7 @@ final class FilterExportConfig
     {
         return [
             $this->filterColumn,
-            $this->valueColumn
+            $this->valueColumn,
         ];
     }
 

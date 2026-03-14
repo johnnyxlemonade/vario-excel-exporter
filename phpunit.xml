@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.5/phpunit.xsd"
+        bootstrap="vendor/autoload.php"
+        colors="true"
+        cacheResult="true"
+        cacheDirectory=".phpunit.cache"
+        executionOrder="depends,defects"
+        failOnRisky="true"
+        failOnWarning="true"
+        failOnDeprecation="true"
+        displayDetailsOnTestsThatTriggerDeprecations="true"
+>
+    <testsuites>
+        <testsuite name="Vario SDK">
+            <directory suffix=".php">vendor/lemonade/vario-online-sdk/tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <source>
+        <include>
+            <directory suffix=".php">vendor/lemonade/vario-online-sdk/src</directory>
+        </include>
+    </source>
+
+    <php>
+        <ini name="display_errors" value="1"/>
+        <ini name="error_reporting" value="-1"/>
+    </php>
+</phpunit>

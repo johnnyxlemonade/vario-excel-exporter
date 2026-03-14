@@ -13,9 +13,11 @@ final class TemplateRenderer
         private readonly string $templateDir,
         private readonly Clock $clock,
         private readonly ?HtmlMinifier $minifier = null
-    ) {
-    }
+    ) {}
 
+    /**
+     * @param array<string,mixed> $data
+     */
     public function render(string $template, array $data = []): string
     {
         ob_start();
@@ -30,11 +32,17 @@ final class TemplateRenderer
         return $html;
     }
 
+    /**
+     * @param array<string,mixed> $data
+     */
     public function display(string $template, array $data = []): void
     {
         echo $this->render($template, $data);
     }
 
+    /**
+     * @param array<string,mixed> $data
+     */
     public function partial(string $template, array $data = []): void
     {
         $this->includeTemplate($template, $data);
@@ -47,9 +55,16 @@ final class TemplateRenderer
 
     public function e(mixed $value): string
     {
+        if (!is_scalar($value) && $value !== null) {
+            return '';
+        }
+
         return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
     }
 
+    /**
+     * @param array<string,mixed> $data
+     */
     private function includeTemplate(string $template, array $data = []): void
     {
         $file = rtrim($this->templateDir, '/\\') . '/' . ltrim($template, '/\\') . '.php';

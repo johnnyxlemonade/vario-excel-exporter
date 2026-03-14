@@ -8,10 +8,10 @@ final class HtmlMinifier
 {
     public function minify(string $html): string
     {
-        // sloučí zalomené atributy uvnitř tagů
         do {
-            $newHtml = preg_replace(
-                '/<([a-z0-9]+)([^>]*?)\s*[\r\n]+([^>]*)>/isu',
+
+            $newHtml = $this->preg(
+                '/<([a-z0-9]+)([^>]*?)\s*[\r\n]+([^>]*)>/iu',
                 '<$1$2 $3>',
                 $html
             );
@@ -37,7 +37,11 @@ final class HtmlMinifier
             '/\),[\r\n\t ]+/s' => '),',
         ];
 
-        $html = preg_replace(array_keys($replace), array_values($replace), $html);
+        $html = $this->preg(
+            array_keys($replace),
+            array_values($replace),
+            $html
+        );
 
         $remove = [
             '</option>',
@@ -50,5 +54,22 @@ final class HtmlMinifier
         ];
 
         return str_ireplace($remove, '', $html);
+    }
+
+    /**
+     * Safe wrapper for preg_replace that never returns null.
+     *
+     * @param string|array<int,string> $pattern
+     * @param string|array<int,string> $replace
+     */
+    private function preg(string|array $pattern, string|array $replace, string $subject): string
+    {
+        $result = preg_replace($pattern, $replace, $subject);
+
+        if ($result === null) {
+            return $subject;
+        }
+
+        return $result;
     }
 }

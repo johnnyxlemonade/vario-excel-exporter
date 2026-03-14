@@ -15,6 +15,7 @@ use App\Domain\Parameter\ParameterSnapshotWriter;
 use App\Export\FilterExporter;
 use App\Export\ProductFilterMapper;
 use App\Infrastructure\Excel\ExcelReader;
+use App\Infrastructure\Hash\FileHasher;
 use App\Infrastructure\Http\FileDownloader;
 use App\Infrastructure\IO\NdjsonReader;
 use App\Infrastructure\IO\NdjsonWriter;
@@ -27,149 +28,201 @@ use App\Presentation\View\TemplateRenderer;
 
 final class Container
 {
-    /** @var array<string, object> */
+    private const TEMPLATE_DIR = __DIR__ . '/../../../templates';
+
+    /** @var array<string,object> */
     private array $instances = [];
+
+    /** @var array<string,callable(self):object> */
+    private array $factories;
+
+    public function __construct()
+    {
+        $this->factories = [
+
+            Clock::class => fn(self $c) => new Clock(),
+
+            NdjsonReader::class => fn(self $c) => new NdjsonReader(),
+
+            NdjsonWriter::class => fn(self $c) => new NdjsonWriter(),
+
+            ExcelReader::class => fn(self $c) => new ExcelReader(),
+
+            FileDownloader::class => fn(self $c) => new FileDownloader(),
+
+            FileHasher::class => fn(self $c) => new FileHasher(),
+
+            HtmlMinifier::class => fn(self $c) => new HtmlMinifier(),
+
+            TemplateRenderer::class => fn(self $c) => new TemplateRenderer(
+                templateDir: self::TEMPLATE_DIR,
+                clock: $c->getClock(),
+                minifier: $c->getHtmlMinifier()
+            ),
+
+            ParameterReportRenderer::class => fn(self $c) =>
+            new ParameterReportRenderer($c->getTemplateRenderer()),
+
+            DatasetSnapshotLoader::class => fn(self $c) =>
+            new DatasetSnapshotLoader($c->getNdjsonReader()),
+
+            DatasetSnapshotWriter::class => fn(self $c) =>
+            new DatasetSnapshotWriter($c->getNdjsonWriter(), $c->getClock()),
+
+            ParameterSnapshotLoader::class => fn(self $c) =>
+            new ParameterSnapshotLoader($c->getNdjsonReader()),
+
+            ParameterSnapshotWriter::class => fn(self $c) =>
+            new ParameterSnapshotWriter($c->getNdjsonWriter()),
+
+            FilterCollection::class => fn(self $c) => new FilterCollection([
+                new Filter('Hmotnost', 'weight'),
+                new Filter('Tloušťka', 'thickness'),
+                new Filter('Výška', 'height'),
+                new Filter('Šířka', 'width'),
+                new Filter('Délka', 'length'),
+                new Filter('Výrobce', 'manufacturer'),
+            ]),
+
+            FilterExporter::class => fn(self $c) =>
+            new FilterExporter(new FilterExportConfig('filter', 'value')),
+
+            ProductFilterMapper::class => fn(self $c) =>
+            new ProductFilterMapper(
+                new ProductFilterExportConfig('product_code', 'filter', 'value')
+            ),
+
+            ParameterAnalyzer::class => function (self $c) {
+
+                $filters = $c->getFilterCollection();
+
+                return new ParameterAnalyzer(
+                    $filters->names(),
+                    $filters->enabled()
+                );
+            },
+
+            ParameterProcessor::class => fn(self $c) => new ParameterProcessor(
+                reader: $c->getExcelReader(),
+                analyzer: $c->getParameterAnalyzer(),
+                filters: $c->getFilterCollection(),
+                filterExporter: $c->getFilterExporter(),
+                mapper: $c->getProductFilterMapper(),
+                snapshotLoader: $c->getDatasetSnapshotLoader(),
+                snapshotWriter: $c->getDatasetSnapshotWriter(),
+                parameterSnapshotLoader: $c->getParameterSnapshotLoader(),
+                parameterSnapshotWriter: $c->getParameterSnapshotWriter(),
+                reportRenderer: $c->getParameterReportRenderer(),
+                downloader: $c->getFileDownloader(),
+                clock: $c->getClock(),
+                hasher: $c->getFileHasher(),
+            ),
+
+        ];
+    }
 
     /**
      * @template T of object
-     * @param class-string<T>|string $key
-     * @param callable(): T $factory
+     * @param class-string<T> $id
      * @return T
      */
-    private function getShared(string $key, callable $factory): object
+    private function service(string $id): object
     {
-        if (!isset($this->instances[$key])) {
-            $this->instances[$key] = $factory();
+        if (!isset($this->instances[$id])) {
+            $this->instances[$id] = ($this->factories[$id])($this);
         }
 
         /** @var T */
-        return $this->instances[$key];
+        return $this->instances[$id];
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Infrastructure (shared)
-    |--------------------------------------------------------------------------
-   */
 
     public function getClock(): Clock
     {
-        return $this->getShared(Clock::class, fn() => new Clock());
+        return $this->service(Clock::class);
     }
 
     public function getNdjsonReader(): NdjsonReader
     {
-        return $this->getShared(NdjsonReader::class, fn() => new NdjsonReader());
+        return $this->service(NdjsonReader::class);
     }
 
     public function getNdjsonWriter(): NdjsonWriter
     {
-        return $this->getShared(NdjsonWriter::class, fn() => new NdjsonWriter());
+        return $this->service(NdjsonWriter::class);
     }
 
     public function getExcelReader(): ExcelReader
     {
-        return $this->getShared(ExcelReader::class, fn() => new ExcelReader());
+        return $this->service(ExcelReader::class);
     }
 
     public function getFileDownloader(): FileDownloader
     {
-        return $this->getShared(FileDownloader::class, fn() => new FileDownloader());
+        return $this->service(FileDownloader::class);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Filters & Configs
-    |--------------------------------------------------------------------------
-   */
     public function getFilterCollection(): FilterCollection
     {
-        return $this->getShared(FilterCollection::class, fn() => new FilterCollection([
-            new Filter('Hmotnost', 'weight'),
-            new Filter('Tloušťka', 'thickness'),
-            new Filter('Výška', 'height'),
-            new Filter('Šířka', 'width'),
-            new Filter('Délka', 'length'),
-            new Filter('Výrobce', 'manufacturer'),
-        ]));
+        return $this->service(FilterCollection::class);
     }
 
     public function getFilterExporter(): FilterExporter
     {
-        return new FilterExporter(new FilterExportConfig('filter', 'value'));
+        return $this->service(FilterExporter::class);
     }
 
     public function getProductFilterMapper(): ProductFilterMapper
     {
-        return new ProductFilterMapper(new ProductFilterExportConfig('product_code', 'filter', 'value'));
+        return $this->service(ProductFilterMapper::class);
     }
 
     public function getParameterAnalyzer(): ParameterAnalyzer
     {
-        $filters = $this->getFilterCollection();
-        return new ParameterAnalyzer($filters->names(), $filters->enabled());
+        return $this->service(ParameterAnalyzer::class);
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Snapshots & Presentation
-    |--------------------------------------------------------------------------
-   */
 
     public function getDatasetSnapshotLoader(): DatasetSnapshotLoader
     {
-        return new DatasetSnapshotLoader($this->getNdjsonReader());
+        return $this->service(DatasetSnapshotLoader::class);
     }
 
     public function getDatasetSnapshotWriter(): DatasetSnapshotWriter
     {
-        return new DatasetSnapshotWriter($this->getNdjsonWriter(), $this->getClock());
+        return $this->service(DatasetSnapshotWriter::class);
     }
 
     public function getParameterSnapshotLoader(): ParameterSnapshotLoader
     {
-        return new ParameterSnapshotLoader($this->getNdjsonReader());
+        return $this->service(ParameterSnapshotLoader::class);
     }
 
     public function getParameterSnapshotWriter(): ParameterSnapshotWriter
     {
-        return new ParameterSnapshotWriter($this->getNdjsonWriter());
+        return $this->service(ParameterSnapshotWriter::class);
     }
 
     public function getTemplateRenderer(): TemplateRenderer
     {
-        return $this->getShared(TemplateRenderer::class, fn() => new TemplateRenderer(
-            templateDir: __DIR__ . '/../../../templates',
-            clock: $this->getClock(),
-            minifier: new HtmlMinifier()
-        ));
+        return $this->service(TemplateRenderer::class);
+    }
+
+    public function getHtmlMinifier(): HtmlMinifier
+    {
+        return $this->service(HtmlMinifier::class);
     }
 
     public function getParameterReportRenderer(): ParameterReportRenderer
     {
-        return new ParameterReportRenderer($this->getTemplateRenderer());
+        return $this->service(ParameterReportRenderer::class);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Application Root
-    |--------------------------------------------------------------------------
-   */
+    public function getFileHasher(): FileHasher
+    {
+        return $this->service(FileHasher::class);
+    }
+
     public function getParameterProcessor(): ParameterProcessor
     {
-        return $this->getShared(ParameterProcessor::class, fn() => new ParameterProcessor(
-            reader: $this->getExcelReader(),
-            analyzer: $this->getParameterAnalyzer(),
-            filters: $this->getFilterCollection(),
-            filterExporter: $this->getFilterExporter(),
-            mapper: $this->getProductFilterMapper(),
-            snapshotLoader: $this->getDatasetSnapshotLoader(),
-            snapshotWriter: $this->getDatasetSnapshotWriter(),
-            parameterSnapshotLoader: $this->getParameterSnapshotLoader(),
-            parameterSnapshotWriter: $this->getParameterSnapshotWriter(),
-            reportRenderer: $this->getParameterReportRenderer(),
-            downloader: $this->getFileDownloader(),
-            clock: $this->getClock()
-        ));
+        return $this->service(ParameterProcessor::class);
     }
 }

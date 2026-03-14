@@ -11,8 +11,7 @@ final class ParameterSnapshotLoader
 {
     public function __construct(
         private readonly NdjsonReader $reader
-    ) {
-    }
+    ) {}
 
     /**
      * @return list<Parameter>
@@ -24,11 +23,30 @@ final class ParameterSnapshotLoader
 
         foreach ($this->reader->read($file) as $row) {
 
+            $field = $row['field'] ?? null;
+            $index = $row['index'] ?? null;
+            $name  = $row['name'] ?? null;
+            $values = $row['values'] ?? null;
+
+            if (
+                !is_string($field) ||
+                !is_int($index) ||
+                !is_string($name) ||
+                !is_array($values)
+            ) {
+                continue;
+            }
+
+            /** @var list<string> $values */
+            $values = array_values(
+                array_filter($values, static fn($v) => is_string($v))
+            );
+
             $parameters[] = new Parameter(
-                field:  $row['field'],
-                index:  $row['index'],
-                name:   $row['name'],
-                values: $row['values']
+                field: $field,
+                index: $index,
+                name: $name,
+                values: $values
             );
         }
 

@@ -14,8 +14,7 @@ final class Parameter
         private readonly int $index,
         private readonly string $name,
         private readonly array $values
-    ) {
-    }
+    ) {}
 
     public function getField(): string
     {

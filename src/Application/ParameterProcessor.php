@@ -13,6 +13,7 @@ use App\Export\ExportPaths;
 use App\Export\FilterExporter;
 use App\Export\ProductFilterMapper;
 use App\Infrastructure\Excel\ExcelReader;
+use App\Infrastructure\Hash\FileHasher;
 use App\Infrastructure\Http\FileDownloader;
 use App\Infrastructure\Http\QueryHelper;
 use App\Infrastructure\Snapshot\DatasetSnapshotLoader;
@@ -43,9 +44,9 @@ class ParameterProcessor
 
         /* Infrastructure */
         private readonly FileDownloader $downloader,
-        private readonly Clock $clock
-    ) {
-    }
+        private readonly Clock $clock,
+        private readonly FileHasher $hasher
+    ) {}
 
     public function process(
         string $file,
@@ -111,11 +112,15 @@ class ParameterProcessor
         );
     }
 
+    /**
+     * @param list<Parameter> $parameters
+     */
     private function streamFilters(ExportPaths $paths, array $parameters, string $format): never
     {
         $filename = $this->buildExportFilename(paths: $paths, type: 'filters', extension: $format);
 
-        $callback = fn($writeRow) => $this->filterExporter->export($parameters, $writeRow);
+        $callback = fn(callable $writeRow) =>
+        $this->filterExporter->export($parameters, $writeRow);
 
         match ($format) {
             'csv'  => $this->downloader->streamCsv($filename, $callback),
@@ -124,6 +129,9 @@ class ParameterProcessor
         };
     }
 
+    /**
+     * @param list<Parameter> $parameters
+     */
     private function streamMapping(
         ExportPaths $paths,
         ExcelDataset $dataset,
@@ -132,7 +140,8 @@ class ParameterProcessor
     ): never {
         $filename = $this->buildExportFilename(paths: $paths, type: 'mapping', extension: $format);
 
-        $callback = fn($writeRow) => $this->mapper->export(
+        $callback = fn(callable $writeRow) =>
+        $this->mapper->export(
             $parameters,
             $dataset->getRows(),
             $writeRow
@@ -151,8 +160,10 @@ class ParameterProcessor
         string $filtersOutputDir
     ): ExcelDataset {
 
+        $fileHash = $this->hasher->sha1Short($file);
+
         $snapshotFile = rtrim($filtersOutputDir, '/')
-            . '/dataset_' . substr(sha1_file($file), 0, 12) . '.json';
+            . "/dataset_{$fileHash}.json";
 
         if (file_exists($snapshotFile)) {
             return $this->snapshotLoader->load($snapshotFile);
@@ -168,13 +179,16 @@ class ParameterProcessor
         return $dataset;
     }
 
+    /**
+     * @return list<Parameter>
+     */
     private function loadParametersFromSnapshotOrAnalyze(
         ExcelDataset $dataset,
         string $file,
         string $filtersOutputDir
     ): array {
 
-        $datasetHash = substr(sha1_file($file), 0, 12);
+        $datasetHash = $this->hasher->sha1Short($file);
         $configHash = $this->analyzer->getConfigHash();
 
         $parameterSnapshot = rtrim($filtersOutputDir, '/')
@@ -219,10 +233,11 @@ class ParameterProcessor
 
         $configHash = $this->analyzer->getConfigHash();
 
-        $hash = substr(
-            sha1(sha1_file($file) . $configHash),
-            0,
-            12
+        $fileHash = $this->hasher->sha1($file);
+
+        $hash = $this->hasher->combinedShort(
+            $fileHash,
+            $configHash
         );
 
         $filtersOutput = rtrim($filtersOutputDir, '/') . "/filters_{$hash}.csv";
@@ -234,4 +249,5 @@ class ParameterProcessor
             $hash
         );
     }
+
 }

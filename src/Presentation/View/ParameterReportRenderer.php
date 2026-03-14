@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace App\Presentation\View;
 
+use App\Domain\Filter\Filter;
 use App\Domain\Parameter\Parameter;
 use App\Export\ExportPaths;
-use App\Infrastructure\Time\Clock;
 
 final class ParameterReportRenderer
 {
     public function __construct(
         private readonly TemplateRenderer $templates
-    ) {
-    }
+    ) {}
 
     /**
      * @param list<Parameter> $parameters
-     * @param array<string,mixed> $filters
+     * @param list<Filter> $filters
      */
     public function render(
         array $parameters,
@@ -28,13 +27,12 @@ final class ParameterReportRenderer
 
         /** @var array{
          *     parameters: list<Parameter>,
-         *     filters: array<string,mixed>,
+         *     filters: list<Filter>,
          *     filtersOutput: string,
          *     mappingOutput: string,
          *     datasetHash: string,
          *     sourceFile: string,
-         *     fileName: string,
-         *     clock: Clock
+         *     fileName: string
          * } $data
          */
         $data = [

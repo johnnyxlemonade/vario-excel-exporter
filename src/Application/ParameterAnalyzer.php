@@ -46,8 +46,8 @@ class ParameterAnalyzer
 
         return sha1(json_encode([
             'ignore' => $ignore,
-            'enable' => $enabled
-        ]));
+            'enable' => $enabled,
+        ], JSON_THROW_ON_ERROR));
     }
 
     /**
@@ -64,13 +64,14 @@ class ParameterAnalyzer
 
         foreach ($headers as $i => $field) {
 
-            $field = (string) ($field ?? '');
+            $field = is_scalar($field) ? (string) $field : '';
 
             if (!str_starts_with($field, 'F:')) {
                 continue;
             }
 
-            $name = trim((string) ($labels[$i] ?? ''), '(){} ');
+            $label = $labels[$i] ?? null;
+            $name = is_scalar($label) ? trim((string) $label, '(){} ') : '';
 
             $ignored = isset($this->ignoreMap[$name]);
             $enabled = isset($this->enabledMap[$name]);
@@ -82,7 +83,7 @@ class ParameterAnalyzer
             $parameters[$i] = [
                 'field' => $field,
                 'name'  => $name,
-                'index' => $i
+                'index' => $i,
             ];
 
             $valueMaps[$i] = [];
@@ -92,7 +93,8 @@ class ParameterAnalyzer
 
             foreach ($parameters as $i => $_param) {
 
-                $value = trim((string) ($row[$i] ?? ''));
+                $raw = $row[$i] ?? null;
+                $value = is_scalar($raw) ? trim((string) $raw) : '';
 
                 if ($value === '') {
                     continue;
@@ -109,7 +111,7 @@ class ParameterAnalyzer
             $result[] = new Parameter(
                 field: $meta['field'],
                 index: $meta['index'],
-                name:  $meta['name'],
+                name: $meta['name'],
                 values: array_keys($valueMaps[$i])
             );
         }

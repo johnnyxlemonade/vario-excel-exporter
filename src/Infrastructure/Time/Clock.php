@@ -13,8 +13,7 @@ final class Clock
 
     public function __construct(
         private readonly DateTimeZone $timezone = new DateTimeZone('Europe/Prague')
-    ) {
-    }
+    ) {}
 
     public function now(): DateTimeImmutable
     {

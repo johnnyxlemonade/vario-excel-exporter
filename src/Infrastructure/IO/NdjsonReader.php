@@ -38,7 +38,7 @@ final class NdjsonReader
             );
 
             if (!is_array($data)) {
-                throw new RuntimeException("Invalid NDJSON row");
+                throw new RuntimeException('Invalid NDJSON row');
             }
 
             /** @var array<string,mixed> $data */

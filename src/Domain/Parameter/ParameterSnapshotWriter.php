@@ -10,8 +10,7 @@ final class ParameterSnapshotWriter
 {
     public function __construct(
         private readonly NdjsonWriter $writer
-    ) {
-    }
+    ) {}
 
     /**
      * @param list<Parameter> $parameters

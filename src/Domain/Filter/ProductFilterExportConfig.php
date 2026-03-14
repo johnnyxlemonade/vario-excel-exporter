@@ -17,8 +17,7 @@ final class ProductFilterExportConfig
         private readonly string $productCodeColumn = 'product_code',
         private readonly string $filterColumn = 'filter',
         private readonly string $valueColumn = 'value'
-    ) {
-    }
+    ) {}
 
     /**
      * @return list<string>
@@ -28,7 +27,7 @@ final class ProductFilterExportConfig
         return [
             $this->productCodeColumn,
             $this->filterColumn,
-            $this->valueColumn
+            $this->valueColumn,
         ];
     }
 
