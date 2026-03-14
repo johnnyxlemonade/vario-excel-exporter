@@ -1,0 +1,28 @@
+# Kódování
+AddDefaultCharset utf-8
+
+# Zákaz výpisu složek
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Ochrana .env a citlivých souborů
+  RewriteRule ^\.env$ - [F,L]
+  RewriteRule ^composer\.(json|lock)$ - [F,L]
+
+  # Zakázání přímého přístupu k ostatním PHP souborům
+  RewriteCond %{REQUEST_URI} !^/index\.php$
+  RewriteRule \.php$ - [F,L]
+
+  # Router: Pokud soubor neexistuje, vše jde na index.php
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^(.*)$ index.php [L,QSA]
+</IfModule>
+
+# Vypnutí komprese pro downloady (aby fungoval stream)
+<IfModule mod_env.c>
+    SetEnv no-gzip 1
+</IfModule>

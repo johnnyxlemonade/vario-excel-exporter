@@ -1,0 +1,120 @@
+#################################################
+# IDE / Editor files – složky a metadata generovaná vývojovým prostředím
+#################################################
+.idea/
+.idea/*
+.vscode/
+nbproject/
+.project
+.classpath
+.settings/
+
+#################################################
+# OS-specific soubory – nepotřebné systémové cache
+#################################################
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+#################################################
+# Android Studio / IntelliJ Crashlytics a Rest Client
+#################################################
+com_crashlytics_export_strings.xml
+crashlytics.properties
+crashlytics-build.properties
+fabric.properties
+.idea/httpRequests
+.idea/caches/build_file_checksums.ser
+
+#################################################
+# Vývojová konfigurace (jen pro lokální prostředí)
+#################################################
+*/config/development
+
+#################################################
+# Logy aplikace – ale necháváme index.html a .htaccess
+#################################################
+*/logs/log-*.php
+!*/logs/index.html
+application/logs/*
+!application/logs/index.html
+!application/logs/.htaccess
+
+#################################################
+# Cache složky – ignorujeme vše kromě index.html a .htaccess
+#################################################
+*/cache/*
+!*/cache/index.html
+!*/cache/.htaccess
+
+#################################################
+# Writable data – dynamicky generované aplikací
+#################################################
+writable/*
+!.keep
+
+#################################################
+# Storage – uživatelská a dočasná data
+#################################################
+/storage/*
+/import/*
+storage/0/cache/*
+storage/0/api/*
+storage/0/backup/*
+storage/0/captcha/*
+storage/0/export/*
+storage/0/static/*
+storage/0/watermark/font/*
+storage/0/watermark/img/*
+storage/0/youtube/*
+storage/0/video/*
+
+#################################################
+# SQL a další podpůrné složky (nechceme v repozitáři)
+#################################################
+*/sql
+
+#################################################
+# Vendor dependencies – instalované Composerem
+#################################################
+vendor/
+
+#################################################
+# Themes – kompilované CSS/JS
+#################################################
+themes/frontend/compiled/*
+
+#################################################
+# Build / distribuce (pokud používáš Node, bundlery apod.)
+#################################################
+/build/
+/dist/
+/node_modules/
+
+#################################################
+# Docker / CI – lokální docker konfigurace
+#################################################
+.docker/
+docker-compose.override.yml
+
+#################################################
+# Bezpečnostní a citlivé soubory
+#################################################
+.env
+.env.local
+.env.*.local
+*.pem
+*.crt
+*.key
+
+#################################################
+# Výjimky – co v repozitáři mít chceme
+#################################################
+!composer.lock
+/.sql
+/exports

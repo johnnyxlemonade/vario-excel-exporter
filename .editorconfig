@@ -1,0 +1,102 @@
+# EditorConfig – projektová konfigurace formátování
+#
+# Zajišťuje jednotné odsazování, konce řádků a chování s mezerami
+# napříč backendem (PHP, shell, Makefile), frontendem (CSS, JS, HTML),
+# i konfiguračními soubory (YAML, JSON, XML, INI, ENV).
+# Součástí je také výjimka pro Markdown a ignorování složek vendor/,
+# node_modules a build/dist výstupů.
+#
+# @package     Lemonade Framework
+# @link        https://lemonadeframework.cz/
+# @author      Honza Mudrak <honzamudrak@gmail.com>
+# @license     MIT
+# @since       1.0.0
+# @see         PSR-12, EditorConfig.org
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+trim_trailing_whitespace = true
+insert_final_newline = true
+max_line_length = 120
+
+# PHP (PSR-12 doporučuje 4 mezery a max 120 znaků na řádek)
+[*.php]
+indent_style = space
+indent_size = 4
+
+# Markdown (ponechat koncové mezery kvůli zalomení řádků)
+[*.md]
+trim_trailing_whitespace = false
+
+# YAML / JSON / XML / configy
+[*.{yml,yaml,json,xml,ini}]
+indent_style = space
+indent_size = 2
+
+# ENV soubory (.env, .env.local…)
+[.*env*]
+indent_style = space
+indent_size = 2
+
+# CSS / SCSS / LESS
+[*.{css,scss,less}]
+indent_style = space
+indent_size = 2
+
+# JavaScript / TypeScript
+[*.{js,jsx,ts,tsx}]
+indent_style = space
+indent_size = 2
+
+# HTML / šablony (Twig, Blade, Latte)
+[*.{html,htm,twig,blade.php,latte}]
+indent_style = space
+indent_size = 2
+
+# SQL soubory
+[*.sql]
+indent_style = space
+indent_size = 2
+
+# Dockerfile
+[Dockerfile]
+indent_style = space
+indent_size = 2
+
+# Shell skripty
+[*.sh]
+indent_style = space
+indent_size = 4
+
+# Makefile musí mít TAB
+[Makefile]
+indent_style = tab
+
+# Speciální ignore soubory
+[*.{gitignore,dockerignore,npmrc}]
+indent_style = space
+indent_size = 2
+
+# Ignoruj vendory a buildy
+[vendor/**]
+indent_style = unset
+indent_size = unset
+insert_final_newline = unset
+
+[node_modules/**]
+indent_style = unset
+indent_size = unset
+insert_final_newline = unset
+
+[dist/**]
+indent_style = unset
+indent_size = unset
+insert_final_newline = unset
+
+[build/**]
+indent_style = unset
+indent_size = unset
+insert_final_newline = unset
