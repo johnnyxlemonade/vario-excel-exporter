@@ -1,4 +1,7 @@
 # Vario Excel Exporter
+![PHP Version](https://img.shields.io/badge/php-%5E8.1-blue.svg)
+![PHPStan Level 10](https://img.shields.io/badge/PHPStan-level%2010-brightgreen.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
 
 Lightweight PHP utility designed to analyze large Excel datasets and generate filtered exports in multiple formats with zero memory overhead.
 
