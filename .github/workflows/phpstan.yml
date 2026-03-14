@@ -7,7 +7,7 @@ on:
       - 'src/**'
       - 'composer.json'
       - 'composer.lock'
-      - 'phpstan.neon.dist'
+      - 'phpstan.neon'
       - '.github/workflows/**'
 
   pull_request:
@@ -15,7 +15,7 @@ on:
       - 'src/**'
       - 'composer.json'
       - 'composer.lock'
-      - 'phpstan.neon.dist'
+      - 'phpstan.neon'
 
   workflow_dispatch:
 
@@ -36,14 +36,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Validate repository structure
-        run: |
-          set -euo pipefail
-          if [ ! -f composer.json ]; then
-            echo "::error::composer.json is missing. Repository is in invalid state."
-            exit 1
-          fi
-
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
@@ -51,7 +43,8 @@ jobs:
           tools: composer:v2
           extensions: json
 
-      - run: composer validate --strict
+      - name: Composer validate
+        run: composer validate --strict
 
       - id: composer-cache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
@@ -62,7 +55,8 @@ jobs:
           key: composer-${{ runner.os }}-${{ matrix.php }}-${{ hashFiles('**/composer.lock') }}
           restore-keys: composer-${{ runner.os }}-${{ matrix.php }}-
 
-      - run: composer install --no-interaction --prefer-dist --no-progress --no-scripts
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress --no-scripts
 
       - name: Run PHPStan
         run: composer stan:ci
