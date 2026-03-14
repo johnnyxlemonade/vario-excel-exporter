@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f62b091d483fc556eaccab5902e841a0",
+    "content-hash": "b0498dc3abb5f61a477ae76a6b2437f6",
     "packages": [
         {
             "name": "openspout/openspout",
@@ -4478,8 +4478,8 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "ext-iconv": "*",
-        "php": "^8.1"
+        "php": "^8.1",
+        "ext-iconv": "*"
     },
     "platform-dev": [],
     "plugin-api-version": "2.6.0"
