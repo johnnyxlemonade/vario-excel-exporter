@@ -25,24 +25,38 @@ final class ParameterReportRenderer
         string $sourceFile
     ): string {
 
+        $hash = $paths->getHash();
+        $token = time();
+
         /** @var array{
          *     parameters: list<Parameter>,
          *     filters: list<Filter>,
-         *     filtersOutput: string,
-         *     mappingOutput: string,
+         *     filtersCsv: string,
+         *     filtersJson: string,
+         *     filtersXlsx: string,
+         *     mappingCsv: string,
+         *     mappingJson: string,
+         *     mappingXlsx: string,
          *     datasetHash: string,
          *     sourceFile: string,
          *     fileName: string
          * } $data
          */
         $data = [
-            'parameters'    => $parameters,
-            'filters'       => $filters,
-            'filtersOutput' => $paths->getFilters(),
-            'mappingOutput' => $paths->getMapping(),
-            'datasetHash'   => $paths->getHash(),
-            'sourceFile'    => $sourceFile,
-            'fileName'      => basename($sourceFile),
+            'parameters' => $parameters,
+            'filters' => $filters,
+
+            'filtersCsv'  => "?download=filters&format=csv&_v={$hash}&_t={$token}",
+            'filtersJson' => "?download=filters&format=json&_v={$hash}&_t={$token}",
+            'filtersXlsx' => "?download=filters&format=xlsx&_v={$hash}&_t={$token}",
+
+            'mappingCsv'  => "?download=mapping&format=csv&_v={$hash}&_t={$token}",
+            'mappingJson' => "?download=mapping&format=json&_v={$hash}&_t={$token}",
+            'mappingXlsx' => "?download=mapping&format=xlsx&_v={$hash}&_t={$token}",
+
+            'datasetHash' => $hash,
+            'sourceFile' => $sourceFile,
+            'fileName' => basename($sourceFile),
         ];
 
         return $this->templates->render('report', $data);

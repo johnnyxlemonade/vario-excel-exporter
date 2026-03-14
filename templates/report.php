@@ -3,13 +3,19 @@
 declare(strict_types=1);
 
 /** @var \App\Presentation\View\TemplateRenderer $view */
-/** @var array $parameters */
-/** @var array $filters */
-/** @var string $filtersOutput */
-/** @var string $mappingOutput */
+/** @var list<\App\Domain\Parameter\Parameter> $parameters */
+/** @var list<\App\Domain\Filter\Filter> $filters */
 /** @var string $sourceFile */
 /** @var string $fileName */
 /** @var string $datasetHash */
+
+/** @var string $filtersCsv */
+/** @var string $filtersJson */
+/** @var string $filtersXlsx */
+
+/** @var string $mappingCsv */
+/** @var string $mappingJson */
+/** @var string $mappingXlsx */
 ?>
 
 <!DOCTYPE html>
@@ -55,7 +61,13 @@ declare(strict_types=1);
         'parameters' => $parameters,
         'filters' => $filters,
         'sourceFile' => $sourceFile,
-        'datasetHash' => $datasetHash
+        'datasetHash' => $datasetHash,
+        'filtersCsv'  => $filtersCsv,
+        'filtersJson' => $filtersJson,
+        'filtersXlsx' => $filtersXlsx,
+        'mappingCsv'  => $mappingCsv,
+        'mappingJson' => $mappingJson,
+        'mappingXlsx' => $mappingXlsx,
     ]);
 
     $view->partial('partials/parameters_table', [

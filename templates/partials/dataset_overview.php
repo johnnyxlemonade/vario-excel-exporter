@@ -2,12 +2,21 @@
 
 declare(strict_types=1);
 
-
 /** @var \App\Presentation\View\TemplateRenderer $view */
 /** @var list<\App\Domain\Parameter\Parameter> $parameters */
 /** @var list<\App\Domain\Filter\Filter> $filters */
 /** @var string $sourceFile */
 /** @var string $datasetHash */
+
+/** export urls */
+/** @var string $filtersCsv */
+/** @var string $filtersJson */
+/** @var string $filtersXlsx */
+/** @var string $mappingCsv */
+/** @var string $mappingJson */
+/** @var string $mappingXlsx */
+
+use App\Infrastructure\Http\QueryHelper;
 
 $fileName = basename($sourceFile);
 
@@ -17,28 +26,6 @@ $valueCount = 0;
 foreach ($parameters as $p) {
     $valueCount += count($p->getValues());
 }
-
-/*
-|--------------------------------------------------------------------------
-| Query for exports
-|--------------------------------------------------------------------------
-*/
-
-$query = \App\Infrastructure\Http\QueryHelper::all();
-$token = $view->clock()->now()->getTimestamp();
-
-$filtersQuery = $query;
-$filtersQuery['download'] = 'filters';
-$filtersQuery['_v'] = $datasetHash;
-$filtersQuery['_t'] = $token;
-
-$mappingQuery = $query;
-$mappingQuery['download'] = 'mapping';
-$mappingQuery['_v'] = $datasetHash;
-$mappingQuery['_t'] = $token;
-
-$filtersUrl = '?' . http_build_query($filtersQuery);
-$mappingUrl = '?' . http_build_query($mappingQuery);
 
 ?>
 
@@ -99,7 +86,7 @@ $mappingUrl = '?' . http_build_query($mappingQuery);
 
                 <?php
 
-                $currentQuery = \App\Infrastructure\Http\QueryHelper::all();
+                $currentQuery = QueryHelper::all();
                 unset($currentQuery['download']);
 
                 foreach ($filters as $filter) :
@@ -143,17 +130,6 @@ $mappingUrl = '?' . http_build_query($mappingQuery);
     <?php endif; ?>
 
 
-    <?php
-    $buildUrl = function(string $type, string $format) use ($query, $datasetHash, $token): string {
-        $q = $query;
-        $q['download'] = $type;
-        $q['format'] = $format;
-        $q['_v'] = $datasetHash;
-        $q['_t'] = $token;
-        return '?' . http_build_query($q);
-    };
-    ?>
-
     <h6 class="border-bottom pb-2 mb-3">Exports</h6>
 
     <p class="text-muted">
@@ -167,45 +143,62 @@ $mappingUrl = '?' . http_build_query($mappingQuery);
             <button class="btn btn-primary dropdown-toggle shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="fa fa-filter"></i> Download filters
             </button>
+
             <ul class="dropdown-menu shadow">
+
                 <li>
-                    <a class="dropdown-item" href="<?= $view->e($buildUrl('filters', 'xlsx')) ?>">
-                        <i class="fa fa-file-excel-o text-success" style="width: 20px;"></i> Excel (.xlsx)
+                    <a class="dropdown-item" href="<?= $view->e($filtersXlsx) ?>">
+                        <i class="fa fa-file-excel-o text-success" style="width: 20px;"></i>
+                        Excel (.xlsx)
                     </a>
                 </li>
+
                 <li>
-                    <a class="dropdown-item" href="<?= $view->e($buildUrl('filters', 'csv')) ?>">
-                        <i class="fa fa-file-text-o text-info" style="width: 20px;"></i> CSV (.csv)
+                    <a class="dropdown-item" href="<?= $view->e($filtersCsv) ?>">
+                        <i class="fa fa-file-text-o text-info" style="width: 20px;"></i>
+                        CSV (.csv)
                     </a>
                 </li>
+
                 <li>
-                    <a class="dropdown-item" href="<?= $view->e($buildUrl('filters', 'json')) ?>">
-                        <i class="fa fa-file-code-o text-warning" style="width: 20px;"></i> JSON (.json)
+                    <a class="dropdown-item" href="<?= $view->e($filtersJson) ?>">
+                        <i class="fa fa-file-code-o text-warning" style="width: 20px;"></i>
+                        JSON (.json)
                     </a>
                 </li>
+
             </ul>
         </div>
+
 
         <div class="dropdown">
             <button class="btn btn-outline-secondary dropdown-toggle shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="fa fa-sitemap"></i> Download product mapping
             </button>
+
             <ul class="dropdown-menu shadow">
+
                 <li>
-                    <a class="dropdown-item" href="<?= $view->e($buildUrl('mapping', 'xlsx')) ?>">
-                        <i class="fa fa-file-excel-o text-success" style="width: 20px;"></i> Excel (.xlsx)
+                    <a class="dropdown-item" href="<?= $view->e($mappingXlsx) ?>">
+                        <i class="fa fa-file-excel-o text-success" style="width: 20px;"></i>
+                        Excel (.xlsx)
                     </a>
                 </li>
+
                 <li>
-                    <a class="dropdown-item" href="<?= $view->e($buildUrl('mapping', 'csv')) ?>">
-                        <i class="fa fa-file-text-o text-info" style="width: 20px;"></i> CSV (.csv)
+                    <a class="dropdown-item" href="<?= $view->e($mappingCsv) ?>">
+                        <i class="fa fa-file-text-o text-info" style="width: 20px;"></i>
+                        CSV (.csv)
                     </a>
                 </li>
+
                 <li>
-                    <a class="dropdown-item" href="<?= $view->e($buildUrl('mapping', 'json')) ?>">
-                        <i class="fa fa-file-code-o text-warning" style="width: 20px;"></i> JSON (.json)
+                    <a class="dropdown-item" href="<?= $view->e($mappingJson) ?>">
+                        <i class="fa fa-file-code-o text-warning" style="width: 20px;"></i>
+                        JSON (.json)
                     </a>
                 </li>
+
             </ul>
         </div>
 

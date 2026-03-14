@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\DI;
 
+use App\Application\ExportService;
 use App\Application\ParameterAnalyzer;
 use App\Application\ParameterProcessor;
+use App\Application\ParameterRepository;
 use App\Domain\Filter\Filter;
 use App\Domain\Filter\FilterCollection;
 use App\Domain\Filter\FilterExportConfig;
@@ -92,6 +94,27 @@ final class Container
                 new ProductFilterExportConfig('product_code', 'filter', 'value')
             ),
 
+            ParameterRepository::class => fn(self $c) =>
+            new ParameterRepository(
+                reader: $c->getExcelReader(),
+                analyzer: $c->getParameterAnalyzer(),
+                datasetLoader: $c->getDatasetSnapshotLoader(),
+                datasetWriter: $c->getDatasetSnapshotWriter(),
+                parameterLoader: $c->getParameterSnapshotLoader(),
+                parameterWriter: $c->getParameterSnapshotWriter(),
+                hasher: $c->getFileHasher(),
+            ),
+
+            ExportService::class => fn(self $c) =>
+            new ExportService(
+                filterExporter: $c->getFilterExporter(),
+                productFilterMapper: $c->getProductFilterMapper(),
+                downloader: $c->getFileDownloader(),
+                clock: $c->getClock(),
+                analyzer: $c->getParameterAnalyzer(),
+                hasher: $c->getFileHasher(),
+            ),
+
             ParameterAnalyzer::class => function (self $c) {
 
                 $filters = $c->getFilterCollection();
@@ -102,20 +125,12 @@ final class Container
                 );
             },
 
-            ParameterProcessor::class => fn(self $c) => new ParameterProcessor(
-                reader: $c->getExcelReader(),
-                analyzer: $c->getParameterAnalyzer(),
+            ParameterProcessor::class => fn(self $c) =>
+            new ParameterProcessor(
+                repository: $c->getParameterRepository(),
+                exportService: $c->getExportService(),
                 filters: $c->getFilterCollection(),
-                filterExporter: $c->getFilterExporter(),
-                mapper: $c->getProductFilterMapper(),
-                snapshotLoader: $c->getDatasetSnapshotLoader(),
-                snapshotWriter: $c->getDatasetSnapshotWriter(),
-                parameterSnapshotLoader: $c->getParameterSnapshotLoader(),
-                parameterSnapshotWriter: $c->getParameterSnapshotWriter(),
                 reportRenderer: $c->getParameterReportRenderer(),
-                downloader: $c->getFileDownloader(),
-                clock: $c->getClock(),
-                hasher: $c->getFileHasher(),
             ),
 
         ];
@@ -224,5 +239,15 @@ final class Container
     public function getParameterProcessor(): ParameterProcessor
     {
         return $this->service(ParameterProcessor::class);
+    }
+
+    public function getParameterRepository(): ParameterRepository
+    {
+        return $this->service(ParameterRepository::class);
+    }
+
+    public function getExportService(): ExportService
+    {
+        return $this->service(ExportService::class);
     }
 }

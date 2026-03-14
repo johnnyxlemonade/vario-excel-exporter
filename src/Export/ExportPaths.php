@@ -6,28 +6,14 @@ namespace App\Export;
 
 final class ExportPaths
 {
-    private readonly string $filters;
-    private readonly string $mapping;
-    private readonly string $hash;
-
     public function __construct(
-        string $filters,
-        string $mapping,
-        string $hash
-    ) {
-        $this->filters = $filters;
-        $this->mapping = $mapping;
-        $this->hash = $hash;
-    }
+        private readonly string $dir,
+        private readonly string $hash
+    ) {}
 
-    public function getFilters(): string
+    public function getDir(): string
     {
-        return $this->filters;
-    }
-
-    public function getMapping(): string
-    {
-        return $this->mapping;
+        return $this->dir;
     }
 
     public function getHash(): string
