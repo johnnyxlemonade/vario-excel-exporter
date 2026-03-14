@@ -1,8 +1,7 @@
 {
   "require": {
     "ext-iconv": "*",
-    "openspout/openspout": "^4.25",
-    "guzzlehttp/guzzle": "^7.10"
+    "openspout/openspout": "^4.25"
   },
   "autoload": {
     "psr-4": {
