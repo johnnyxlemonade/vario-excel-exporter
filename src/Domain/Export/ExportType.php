@@ -13,4 +13,9 @@ enum ExportType: string
     {
         return self::tryFrom((string) $value);
     }
+
+    public static function fromQuery(?string $value): ?self
+    {
+        return $value === null ? null : self::tryFrom($value);
+    }
 }

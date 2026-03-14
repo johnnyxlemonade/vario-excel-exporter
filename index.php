@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Application\ProcessRequest;
 use App\Domain\Export\ExportFormat;
+use App\Domain\Export\ExportType;
 use App\Infrastructure\DI\Container;
 use App\Infrastructure\Http\QueryHelper;
 
@@ -17,9 +18,11 @@ try {
         file: 'export_vlastnosti_produktu.xlsx',
         exportDirectory: 'exports',
         format: ExportFormat::fromString(
-            QueryHelper::get(key: 'format', default: 'xlsx')
+            QueryHelper::get('format', 'xlsx')
         ),
-        download: QueryHelper::get(key: 'download')
+        download: ExportType::fromQuery(
+            QueryHelper::get('download')
+        )
     );
 
     $container
