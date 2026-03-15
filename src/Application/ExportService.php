@@ -11,8 +11,11 @@ use App\Export\FilterExporter;
 use App\Export\ProductFilterMapper;
 use App\Export\RowWriter;
 use App\Infrastructure\Hash\FileHasher;
+use App\Infrastructure\Http\DownloadMime;
 use App\Infrastructure\Http\FileDownloader;
 use App\Infrastructure\Time\Clock;
+use Exception;
+use JsonException;
 
 final class ExportService
 {
@@ -25,6 +28,9 @@ final class ExportService
         private readonly FileHasher $hasher
     ) {}
 
+    /**
+     * @throws JsonException
+     */
     public function paths(
         string $file,
         string $exportDir
@@ -46,6 +52,7 @@ final class ExportService
 
     /**
      * @param list<Parameter> $parameters
+     * @throws Exception
      */
     public function streamFilters(
         ExportPaths $paths,
@@ -53,10 +60,10 @@ final class ExportService
         array $parameters,
     ): never {
 
-        $callback = fn(RowWriter $writer) =>
-        $this->filterExporter->export($parameters, $writer);
-
         $headers = $this->filterExporter->config()->headers();
+
+        $callback = fn(RowWriter $writer)
+        => $this->filterExporter->export($parameters, $writer);
 
         $this->stream($paths, $format, 'filters', $headers, $callback);
     }
@@ -64,6 +71,7 @@ final class ExportService
     /**
      * @param list<Parameter> $parameters
      * @param iterable<int, array<int, mixed>> $rows
+     * @throws Exception
      */
     public function streamMapping(
         ExportPaths $paths,
@@ -72,14 +80,14 @@ final class ExportService
         array $parameters,
     ): never {
 
-        $callback = fn(RowWriter $writer) =>
-        $this->productFilterMapper->export(
+        $headers = $this->productFilterMapper->config()->headers();
+
+        $callback = fn(RowWriter $writer)
+        => $this->productFilterMapper->export(
             $parameters,
             $rows,
             $writer
         );
-
-        $headers = $this->productFilterMapper->config()->headers();
 
         $this->stream($paths, $format, 'mapping', $headers, $callback);
     }
@@ -87,6 +95,7 @@ final class ExportService
     /**
      * @param list<string> $headers
      * @param callable(RowWriter):void $callback
+     * @throws Exception
      */
     private function stream(
         ExportPaths $paths,
@@ -97,21 +106,18 @@ final class ExportService
     ): never {
 
         $filename = sprintf(
-            '%s/%s_%s_%s.%s',
-            $paths->getDir(),
+            '%s_%s_%s.%s',
             $prefix,
             $paths->getHash(),
             $this->clock->exportTimestamp(),
             $format->value
         );
 
-        match ($format) {
-            ExportFormat::CSV  => $this->downloader->streamCsv($filename, $headers, $callback),
-            ExportFormat::JSON => $this->downloader->streamJson($filename, $headers, $callback),
-            ExportFormat::XLSX => $this->downloader->streamExcel($filename, $headers, $callback),
-            ExportFormat::XML  => $this->downloader->streamXml($filename, $headers, $callback),
-            ExportFormat::TSV  => $this->downloader->streamTsv($filename, $headers, $callback),
-        };
-
+        $this->downloader->stream(
+            mime: DownloadMime::fromFormat($format),
+            filename: $filename,
+            headers: $headers,
+            callback: $callback
+        );
     }
 }
