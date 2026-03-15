@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Infrastructure\Json;
+namespace App\Infrastructure\Export;
 
 use App\Export\FinishingRowWriter;
 use JsonException;
-use RuntimeException;
 
 final class JsonRowWriter implements FinishingRowWriter
 {
@@ -24,10 +23,6 @@ final class JsonRowWriter implements FinishingRowWriter
      */
     public function __construct($handle, array $headers)
     {
-        if (!is_resource($handle)) {
-            throw new RuntimeException('Invalid JSON output handle');
-        }
-
         $this->handle = $handle;
         $this->headers = $headers;
 

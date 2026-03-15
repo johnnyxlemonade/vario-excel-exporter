@@ -110,6 +110,7 @@ final class ExportService
             ExportFormat::JSON => $this->downloader->streamJson(filename: $filename, headers: $headers, writerCallback: $callback),
             ExportFormat::XLSX => $this->downloader->streamExcel(filename: $filename, writerCallback: $callback),
             ExportFormat::XML  => $this->downloader->streamXml(filename: $filename, headers: $headers, writerCallback: $callback),
+            ExportFormat::TSV => $this->downloader->streamTsv(filename: $filename, writerCallback: $callback),
         };
     }
 }

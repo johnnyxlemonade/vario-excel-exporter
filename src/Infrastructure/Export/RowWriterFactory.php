@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace App\Infrastructure\Export;
 
 use App\Export\RowWriter;
-use App\Infrastructure\Csv\CsvRowWriter;
-use App\Infrastructure\Excel\ExcelRowWriter;
-use App\Infrastructure\Json\JsonRowWriter;
-use App\Infrastructure\Xml\XmlRowWriter;
 use OpenSpout\Writer\XLSX\Writer;
 
 final class RowWriterFactory
@@ -19,6 +15,14 @@ final class RowWriterFactory
     public function createCsv($handle): RowWriter
     {
         return new CsvRowWriter($handle);
+    }
+
+    /**
+     * @param resource $handle
+     */
+    public function createTsv($handle): RowWriter
+    {
+        return new TsvRowWriter($handle);
     }
 
     /**

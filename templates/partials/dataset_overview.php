@@ -13,11 +13,13 @@ declare(strict_types=1);
 /** @var string $filtersJson */
 /** @var string $filtersXlsx */
 /** @var string $filtersXml */
+/** @var string $filtersTsv */
 
 /** @var string $mappingCsv */
 /** @var string $mappingJson */
 /** @var string $mappingXlsx */
 /** @var string $mappingXml */
+/** @var string $mappingTsv */
 
 use App\Infrastructure\Http\QueryHelper;
 
@@ -177,6 +179,13 @@ foreach ($parameters as $p) {
                     </a>
                 </li>
 
+                <li>
+                    <a class="dropdown-item" href="<?= $view->e($filtersTsv) ?>">
+                        <i class="fa fa-file-text-o text-secondary" style="width: 20px;"></i>
+                        TSV (.tsv)
+                    </a>
+                </li>
+
             </ul>
         </div>
 
@@ -213,6 +222,13 @@ foreach ($parameters as $p) {
                     <a class="dropdown-item" href="<?= $view->e($mappingXml) ?>">
                         <i class="fa fa-file-code-o text-secondary" style="width: 20px;"></i>
                         XML (.xml)
+                    </a>
+                </li>
+
+                <li>
+                    <a class="dropdown-item" href="<?= $view->e($mappingTsv) ?>">
+                        <i class="fa fa-file-text-o text-secondary" style="width: 20px;"></i>
+                        TSV (.tsv)
                     </a>
                 </li>
 

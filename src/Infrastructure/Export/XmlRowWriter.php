@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Infrastructure\Xml;
+namespace App\Infrastructure\Export;
 
 use App\Export\FinishingRowWriter;
 use App\Export\RowWriter;
-use RuntimeException;
 
 final class XmlRowWriter implements RowWriter, FinishingRowWriter
 {
@@ -22,10 +21,6 @@ final class XmlRowWriter implements RowWriter, FinishingRowWriter
      */
     public function __construct($handle, array $columns)
     {
-        if (!is_resource($handle)) {
-            throw new RuntimeException('Invalid XML output handle');
-        }
-
         $this->handle = $handle;
         $this->columns = $columns;
 

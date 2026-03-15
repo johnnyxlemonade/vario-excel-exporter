@@ -10,4 +10,5 @@ enum DownloadMime: string
     case JSON = 'application/json; charset=utf-8';
     case XML = 'application/xml; charset=utf-8';
     case XLSX = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    case TSV = 'text/tab-separated-values; charset=utf-8';
 }

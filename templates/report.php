@@ -9,15 +9,18 @@ declare(strict_types=1);
 /** @var string $fileName */
 /** @var string $datasetHash */
 
+/** export urls */
 /** @var string $filtersCsv */
 /** @var string $filtersJson */
 /** @var string $filtersXlsx */
 /** @var string $filtersXml */
+/** @var string $filtersTsv */
 
 /** @var string $mappingCsv */
 /** @var string $mappingJson */
 /** @var string $mappingXlsx */
 /** @var string $mappingXml */
+/** @var string $mappingTsv */
 ?>
 
 <!DOCTYPE html>
@@ -69,11 +72,13 @@ declare(strict_types=1);
         'filtersJson' => $filtersJson,
         'filtersXlsx' => $filtersXlsx,
         'filtersXml'  => $filtersXml,
+        'filtersTsv'  => $filtersTsv,
 
         'mappingCsv'  => $mappingCsv,
         'mappingJson' => $mappingJson,
         'mappingXlsx' => $mappingXlsx,
         'mappingXml'  => $mappingXml,
+        'mappingTsv'  => $mappingTsv,
     ]);
 
     $view->partial('partials/parameters_table', [

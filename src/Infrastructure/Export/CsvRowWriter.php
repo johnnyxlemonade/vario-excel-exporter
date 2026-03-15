@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Infrastructure\Csv;
+namespace App\Infrastructure\Export;
 
 use App\Export\RowWriter;
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Infrastructure\Excel;
+namespace App\Infrastructure\Export;
 
 use App\Export\RowWriter;
 use OpenSpout\Common\Entity\Cell;

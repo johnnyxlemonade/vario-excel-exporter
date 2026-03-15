@@ -21,20 +21,12 @@ final class FileDownloader
      */
     public function streamCsv(string $filename, callable $writerCallback): never
     {
-        $this->prepareDownload(
-            $this->downloadHeaders(DownloadMime::CSV, $filename)
+        $this->streamHandle(
+            mime: DownloadMime::CSV,
+            filename: $filename,
+            writerFactory: fn($handle) => $this->factory->createCsv($handle),
+            callback: $writerCallback
         );
-
-        $handle = $this->openOutput();
-
-        $writer = $this->factory->createCsv($handle);
-
-        $writerCallback($writer);
-
-        fflush($handle);
-        fclose($handle);
-
-        exit;
     }
 
     /**
@@ -45,28 +37,13 @@ final class FileDownloader
         string $filename,
         array $headers,
         callable $writerCallback
-    ): never
-    {
-        $this->prepareDownload(
-            $this->downloadHeaders(DownloadMime::JSON, $filename)
+    ): never {
+        $this->streamHandle(
+            mime: DownloadMime::JSON,
+            filename: $filename,
+            writerFactory: fn($handle) => $this->factory->createJson($handle, $headers),
+            callback: $writerCallback
         );
-
-        $handle = $this->openOutput();
-
-        $writer = $this->factory->createJson(
-            $handle,
-            $headers
-        );
-
-        $writerCallback($writer);
-
-        if ($writer instanceof FinishingRowWriter) {
-            $writer->finish();
-        }
-
-        fclose($handle);
-
-        exit;
     }
 
     /**
@@ -98,25 +75,54 @@ final class FileDownloader
         string $filename,
         array $headers,
         callable $writerCallback
-    ): never
+    ): never {
+        $this->streamHandle(
+            mime: DownloadMime::XML,
+            filename: $filename,
+            writerFactory: fn($handle) => $this->factory->createXml($handle, $headers),
+            callback: $writerCallback
+        );
+    }
+
+    /**
+     * @param callable(RowWriter):void $writerCallback
+     */
+    public function streamTsv(string $filename, callable $writerCallback): never
     {
+        $this->streamHandle(
+            mime: DownloadMime::TSV,
+            filename: $filename,
+            writerFactory: fn($handle) => $this->factory->createTsv($handle),
+            callback: $writerCallback
+        );
+    }
+
+    /**
+     * @param callable(resource):RowWriter $writerFactory
+     * @param callable(RowWriter):void $callback
+     */
+    private function streamHandle(
+        DownloadMime $mime,
+        string $filename,
+        callable $writerFactory,
+        callable $callback
+    ): never {
+
         $this->prepareDownload(
-            $this->downloadHeaders(DownloadMime::XML, $filename)
+            $this->downloadHeaders($mime, $filename)
         );
 
         $handle = $this->openOutput();
 
-        $writer = $this->factory->createXml(
-            $handle,
-            $headers
-        );
+        $writer = $writerFactory($handle);
 
-        $writerCallback($writer);
+        $callback($writer);
 
         if ($writer instanceof FinishingRowWriter) {
             $writer->finish();
         }
 
+        fflush($handle);
         fclose($handle);
 
         exit;
