@@ -17,10 +17,17 @@ final class FileDownloader
     ) {}
 
     /**
+     * @param list<string> $headers
      * @param callable(RowWriter):void $writerCallback
      */
-    public function streamCsv(string $filename, callable $writerCallback): never
-    {
+    public function streamCsv(
+        string $filename,
+        array $headers,
+        callable $writerCallback
+    ): never {
+
+        unset($headers);
+
         $this->streamHandle(
             mime: DownloadMime::CSV,
             filename: $filename,
@@ -47,10 +54,17 @@ final class FileDownloader
     }
 
     /**
+     * @param list<string> $headers
      * @param callable(RowWriter):void $writerCallback
      */
-    public function streamExcel(string $filename, callable $writerCallback): never
-    {
+    public function streamExcel(
+        string $filename,
+        array $headers,
+        callable $writerCallback
+    ): never {
+
+        unset($headers);
+
         $this->prepareDownload(
             $this->downloadHeaders(DownloadMime::XLSX, $filename)
         );
@@ -85,10 +99,16 @@ final class FileDownloader
     }
 
     /**
+     * @param list<string> $headers
      * @param callable(RowWriter):void $writerCallback
      */
-    public function streamTsv(string $filename, callable $writerCallback): never
-    {
+    public function streamTsv(
+        string $filename,
+        array $headers,
+        callable $writerCallback
+    ): never {
+        unset($headers);
+
         $this->streamHandle(
             mime: DownloadMime::TSV,
             filename: $filename,

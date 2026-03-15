@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace App\Infrastructure\Export;
 
 use App\Export\FinishingRowWriter;
+use App\Export\HeaderRowWriter;
 use JsonException;
 
-final class JsonRowWriter implements FinishingRowWriter
+final class JsonRowWriter implements FinishingRowWriter, HeaderRowWriter
 {
     /** @var resource */
     private $handle;
@@ -27,6 +28,11 @@ final class JsonRowWriter implements FinishingRowWriter
         $this->headers = $headers;
 
         fwrite($this->handle, '[');
+    }
+
+    public function writeHeader(array $headers): void
+    {
+        $this->headers = $headers;
     }
 
     /**

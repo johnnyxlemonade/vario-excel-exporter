@@ -27,7 +27,13 @@ class FilterExporter implements ConfigurableExporter
         RowWriter $writer
     ): void {
 
-        $writer->write($this->config->headers());
+        $headers = $this->config->headers();
+
+        if ($writer instanceof HeaderRowWriter) {
+            $writer->writeHeader($headers);
+        } else {
+            $writer->write($headers);
+        }
 
         foreach ($parameters as $parameter) {
 

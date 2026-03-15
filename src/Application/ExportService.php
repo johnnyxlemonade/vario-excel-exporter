@@ -106,11 +106,12 @@ final class ExportService
         );
 
         match ($format) {
-            ExportFormat::CSV  => $this->downloader->streamCsv(filename: $filename, writerCallback: $callback),
-            ExportFormat::JSON => $this->downloader->streamJson(filename: $filename, headers: $headers, writerCallback: $callback),
-            ExportFormat::XLSX => $this->downloader->streamExcel(filename: $filename, writerCallback: $callback),
-            ExportFormat::XML  => $this->downloader->streamXml(filename: $filename, headers: $headers, writerCallback: $callback),
-            ExportFormat::TSV => $this->downloader->streamTsv(filename: $filename, writerCallback: $callback),
+            ExportFormat::CSV  => $this->downloader->streamCsv($filename, $headers, $callback),
+            ExportFormat::JSON => $this->downloader->streamJson($filename, $headers, $callback),
+            ExportFormat::XLSX => $this->downloader->streamExcel($filename, $headers, $callback),
+            ExportFormat::XML  => $this->downloader->streamXml($filename, $headers, $callback),
+            ExportFormat::TSV  => $this->downloader->streamTsv($filename, $headers, $callback),
         };
+
     }
 }

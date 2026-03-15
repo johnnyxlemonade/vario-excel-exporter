@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace App\Infrastructure\Export;
 
 use App\Export\FinishingRowWriter;
+use App\Export\HeaderRowWriter;
 use App\Export\RowWriter;
 
-final class XmlRowWriter implements RowWriter, FinishingRowWriter
+final class XmlRowWriter implements RowWriter, HeaderRowWriter, FinishingRowWriter
 {
     /** @var resource */
     private $handle;
@@ -26,6 +27,11 @@ final class XmlRowWriter implements RowWriter, FinishingRowWriter
 
         fwrite($this->handle, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         fwrite($this->handle, "<rows>\n");
+    }
+
+    public function writeHeader(array $headers): void
+    {
+        $this->columns = $headers;
     }
 
     /**
