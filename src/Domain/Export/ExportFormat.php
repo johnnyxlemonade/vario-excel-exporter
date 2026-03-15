@@ -9,6 +9,7 @@ enum ExportFormat: string
     case CSV = 'csv';
     case JSON = 'json';
     case XLSX = 'xlsx';
+    case XML = 'xml';
 
     public static function fromString(string $value): self
     {

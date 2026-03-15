@@ -9,6 +9,7 @@ use App\Domain\Parameter\Parameter;
 use App\Export\ExportPaths;
 use App\Export\FilterExporter;
 use App\Export\ProductFilterMapper;
+use App\Export\RowWriter;
 use App\Infrastructure\Hash\FileHasher;
 use App\Infrastructure\Http\FileDownloader;
 use App\Infrastructure\Time\Clock;
@@ -52,22 +53,12 @@ final class ExportService
         array $parameters,
     ): never {
 
-        $filename = sprintf(
-            '%s/filters_%s_%s.%s',
-            $paths->getDir(),
-            $paths->getHash(),
-            $this->clock->exportTimestamp(),
-            $format->value
-        );
+        $callback = fn(RowWriter $writer) =>
+        $this->filterExporter->export($parameters, $writer);
 
-        $callback = fn(callable $writeRow)
-        => $this->filterExporter->export($parameters, $writeRow);
+        $headers = $this->filterExporter->config()->headers();
 
-        match ($format) {
-            ExportFormat::CSV  => $this->downloader->streamCsv($filename, $callback),
-            ExportFormat::JSON => $this->downloader->streamJson($filename, $callback),
-            ExportFormat::XLSX => $this->downloader->streamExcel($filename, $callback),
-        };
+        $this->stream($paths, $format, 'filters', $headers, $callback);
     }
 
     /**
@@ -81,25 +72,44 @@ final class ExportService
         array $parameters,
     ): never {
 
+        $callback = fn(RowWriter $writer) =>
+        $this->productFilterMapper->export(
+            $parameters,
+            $rows,
+            $writer
+        );
+
+        $headers = $this->productFilterMapper->config()->headers();
+
+        $this->stream($paths, $format, 'mapping', $headers, $callback);
+    }
+
+    /**
+     * @param list<string> $headers
+     * @param callable(RowWriter):void $callback
+     */
+    private function stream(
+        ExportPaths $paths,
+        ExportFormat $format,
+        string $prefix,
+        array $headers,
+        callable $callback
+    ): never {
+
         $filename = sprintf(
-            '%s/mapping_%s_%s.%s',
+            '%s/%s_%s_%s.%s',
             $paths->getDir(),
+            $prefix,
             $paths->getHash(),
             $this->clock->exportTimestamp(),
             $format->value
         );
 
-        $callback = fn(callable $writeRow) =>
-        $this->productFilterMapper->export(
-            $parameters,
-            $rows,
-            $writeRow
-        );
-
         match ($format) {
-            ExportFormat::CSV  => $this->downloader->streamCsv($filename, $callback),
-            ExportFormat::JSON => $this->downloader->streamJson($filename, $callback),
-            ExportFormat::XLSX => $this->downloader->streamExcel($filename, $callback),
+            ExportFormat::CSV  => $this->downloader->streamCsv(filename: $filename, writerCallback: $callback),
+            ExportFormat::JSON => $this->downloader->streamJson(filename: $filename, headers: $headers, writerCallback: $callback),
+            ExportFormat::XLSX => $this->downloader->streamExcel(filename: $filename, writerCallback: $callback),
+            ExportFormat::XML  => $this->downloader->streamXml(filename: $filename, headers: $headers, writerCallback: $callback),
         };
     }
 }

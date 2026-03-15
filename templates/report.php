@@ -12,10 +12,12 @@ declare(strict_types=1);
 /** @var string $filtersCsv */
 /** @var string $filtersJson */
 /** @var string $filtersXlsx */
+/** @var string $filtersXml */
 
 /** @var string $mappingCsv */
 /** @var string $mappingJson */
 /** @var string $mappingXlsx */
+/** @var string $mappingXml */
 ?>
 
 <!DOCTYPE html>
@@ -62,12 +64,16 @@ declare(strict_types=1);
         'filters' => $filters,
         'sourceFile' => $sourceFile,
         'datasetHash' => $datasetHash,
+
         'filtersCsv'  => $filtersCsv,
         'filtersJson' => $filtersJson,
         'filtersXlsx' => $filtersXlsx,
+        'filtersXml'  => $filtersXml,
+
         'mappingCsv'  => $mappingCsv,
         'mappingJson' => $mappingJson,
         'mappingXlsx' => $mappingXlsx,
+        'mappingXml'  => $mappingXml,
     ]);
 
     $view->partial('partials/parameters_table', [

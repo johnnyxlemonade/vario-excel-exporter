@@ -4,26 +4,30 @@ declare(strict_types=1);
 
 namespace App\Export;
 
+use App\Domain\Export\ExportConfig;
 use App\Domain\Filter\FilterExportConfig;
 use App\Domain\Parameter\Parameter;
 
-class FilterExporter
+class FilterExporter implements ConfigurableExporter
 {
     public function __construct(
         private readonly FilterExportConfig $config
     ) {}
 
+    public function config(): ExportConfig
+    {
+        return $this->config;
+    }
+
     /**
      * @param list<Parameter> $parameters
-     * @param callable(list<string|int|float|bool|null>):void $writeRow
      */
     public function export(
         array $parameters,
-        callable $writeRow
+        RowWriter $writer
     ): void {
 
-        // header
-        $writeRow($this->config->headers());
+        $writer->write($this->config->headers());
 
         foreach ($parameters as $parameter) {
 
@@ -31,7 +35,7 @@ class FilterExporter
 
             foreach ($parameter->getValues() as $value) {
 
-                $writeRow([
+                $writer->write([
                     $name,
                     $value,
                 ]);

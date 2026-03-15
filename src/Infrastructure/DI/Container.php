@@ -17,6 +17,7 @@ use App\Domain\Parameter\ParameterSnapshotWriter;
 use App\Export\FilterExporter;
 use App\Export\ProductFilterMapper;
 use App\Infrastructure\Excel\ExcelReader;
+use App\Infrastructure\Export\RowWriterFactory;
 use App\Infrastructure\Hash\FileHasher;
 use App\Infrastructure\Http\FileDownloader;
 use App\Infrastructure\IO\NdjsonReader;
@@ -50,7 +51,12 @@ final class Container
 
             ExcelReader::class => fn(self $c) => new ExcelReader(),
 
-            FileDownloader::class => fn(self $c) => new FileDownloader(),
+            RowWriterFactory::class => fn(self $c) => new RowWriterFactory(),
+
+            FileDownloader::class => fn(self $c) =>
+            new FileDownloader(
+                $c->getRowWriterFactory()
+            ),
 
             FileHasher::class => fn(self $c) => new FileHasher(),
 
@@ -169,6 +175,11 @@ final class Container
     public function getExcelReader(): ExcelReader
     {
         return $this->service(ExcelReader::class);
+    }
+
+    public function getRowWriterFactory(): RowWriterFactory
+    {
+        return $this->service(RowWriterFactory::class);
     }
 
     public function getFileDownloader(): FileDownloader

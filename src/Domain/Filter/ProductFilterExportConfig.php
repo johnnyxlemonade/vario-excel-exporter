@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domain\Filter;
 
+use App\Domain\Export\ExportConfig;
+
 /**
  * @phpstan-type ColumnMap array{
  *     product_code: string,
@@ -11,7 +13,7 @@ namespace App\Domain\Filter;
  *     value: string
  * }
  */
-final class ProductFilterExportConfig
+final class ProductFilterExportConfig implements ExportConfig
 {
     public function __construct(
         private readonly string $productCodeColumn = 'product_code',

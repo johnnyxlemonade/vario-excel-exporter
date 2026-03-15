@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Domain\Filter;
 
-final class FilterExportConfig
+use App\Domain\Export\ExportConfig;
+
+final class FilterExportConfig implements ExportConfig
 {
     public function __construct(
         private readonly string $filterColumn = 'filter',

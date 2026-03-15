@@ -4,31 +4,32 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Http;
 
-use OpenSpout\Common\Entity\Cell;
-use OpenSpout\Common\Entity\Row;
+use App\Export\FinishingRowWriter;
+use App\Export\RowWriter;
+use App\Infrastructure\Export\RowWriterFactory;
 use OpenSpout\Writer\XLSX\Writer;
+use RuntimeException;
 
 final class FileDownloader
 {
+    public function __construct(
+        private readonly RowWriterFactory $factory
+    ) {}
+
     /**
-     * @param callable(callable(list<string|int|float|bool|null>):void):void $writerCallback
+     * @param callable(RowWriter):void $writerCallback
      */
     public function streamCsv(string $filename, callable $writerCallback): never
     {
-        $this->prepareDownload([
-            'Content-Type' => 'text/csv; charset=utf-8',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-        ]);
+        $this->prepareDownload(
+            $this->downloadHeaders(DownloadMime::CSV, $filename)
+        );
 
         $handle = $this->openOutput();
 
-        $writeRow = function (array $row) use ($handle): void {
+        $writer = $this->factory->createCsv($handle);
 
-            /** @var array<int|string, bool|float|int|string|null> $row */
-            fputcsv($handle, $row, ';');
-        };
-
-        $writerCallback($writeRow);
+        $writerCallback($writer);
 
         fflush($handle);
         fclose($handle);
@@ -37,41 +38,31 @@ final class FileDownloader
     }
 
     /**
-     * @param callable(callable(list<string|int|float|bool|null>):void):void $writerCallback
+     * @param list<string> $headers
+     * @param callable(RowWriter):void $writerCallback
      */
-    public function streamJson(string $filename, callable $writerCallback): never
+    public function streamJson(
+        string $filename,
+        array $headers,
+        callable $writerCallback
+    ): never
     {
-        $this->prepareDownload([
-            'Content-Type' => 'application/json; charset=utf-8',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-        ]);
+        $this->prepareDownload(
+            $this->downloadHeaders(DownloadMime::JSON, $filename)
+        );
 
         $handle = $this->openOutput();
 
-        fwrite($handle, '[');
+        $writer = $this->factory->createJson(
+            $handle,
+            $headers
+        );
 
-        $isFirst = true;
+        $writerCallback($writer);
 
-        $writeRow = function (array $row) use ($handle, &$isFirst): void {
-
-            if (!$isFirst) {
-                fwrite($handle, ',');
-            }
-
-            $json = json_encode($row, JSON_UNESCAPED_UNICODE);
-
-            if ($json === false) {
-                $json = 'null';
-            }
-
-            fwrite($handle, $json);
-
-            $isFirst = false;
-        };
-
-        $writerCallback($writeRow);
-
-        fwrite($handle, ']');
+        if ($writer instanceof FinishingRowWriter) {
+            $writer->finish();
+        }
 
         fclose($handle);
 
@@ -79,34 +70,67 @@ final class FileDownloader
     }
 
     /**
-     * @param callable(callable(list<string|int|float|bool|null>):void):void $writerCallback
+     * @param callable(RowWriter):void $writerCallback
      */
     public function streamExcel(string $filename, callable $writerCallback): never
     {
-        $this->prepareDownload([
-            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-        ]);
+        $this->prepareDownload(
+            $this->downloadHeaders(DownloadMime::XLSX, $filename)
+        );
 
         $writer = new Writer();
         $writer->openToBrowser($filename);
 
-        $writeRow = function (array $row) use ($writer): void {
+        $rowWriter = $this->factory->createExcel($writer);
 
-            $cells = [];
-
-            foreach ($row as $value) {
-                $cells[] = Cell::fromValue($this->safeScalar($value));
-            }
-
-            $writer->addRow(new Row($cells));
-        };
-
-        $writerCallback($writeRow);
+        $writerCallback($rowWriter);
 
         $writer->close();
 
         exit;
+    }
+
+    /**
+     * @param list<string> $headers
+     * @param callable(RowWriter):void $writerCallback
+     */
+    public function streamXml(
+        string $filename,
+        array $headers,
+        callable $writerCallback
+    ): never
+    {
+        $this->prepareDownload(
+            $this->downloadHeaders(DownloadMime::XML, $filename)
+        );
+
+        $handle = $this->openOutput();
+
+        $writer = $this->factory->createXml(
+            $handle,
+            $headers
+        );
+
+        $writerCallback($writer);
+
+        if ($writer instanceof FinishingRowWriter) {
+            $writer->finish();
+        }
+
+        fclose($handle);
+
+        exit;
+    }
+
+    /**
+     * @return array<string,string>
+     */
+    private function downloadHeaders(DownloadMime $mime, string $filename): array
+    {
+        return [
+            'Content-Type' => $mime->value,
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
     }
 
     /**
@@ -136,18 +160,9 @@ final class FileDownloader
         $handle = fopen('php://output', 'w');
 
         if ($handle === false) {
-            throw new \RuntimeException('Cannot open output stream');
+            throw new RuntimeException('Cannot open output stream');
         }
 
         return $handle;
-    }
-
-    private function safeScalar(mixed $value): string|int|float|bool|null
-    {
-        if (!is_scalar($value) && $value !== null) {
-            return null;
-        }
-
-        return $value;
     }
 }
