@@ -9,10 +9,26 @@ use App\Domain\Filter\Filter;
 use App\Domain\Filter\FilterCollection;
 use App\Infrastructure\DI\Container;
 use App\Infrastructure\Http\QueryHelper;
+use App\Presentation\View\Translator;
 
 require 'vendor/autoload.php';
 
 $container = new Container();
+
+$lang = QueryHelper::get('lang', 'en');
+$lang = in_array($lang, ['en', 'cs'], true) ? $lang : 'en';
+
+/** @var array<string,string> $messages */
+$messages = require __DIR__ . "/lang/$lang.php";
+
+$container->set(
+    Translator::class,
+    new Translator(
+        locale: $lang,
+        messages: $messages
+    )
+);
+
 $container->set(
     FilterCollection::class,
     new FilterCollection([
@@ -43,6 +59,5 @@ try {
         ->process($request);
 
 } catch (Throwable $e) {
-
-    echo "[Error]: " . $e->getMessage();
+    echo '[Error]: ' . $e->getMessage();
 }

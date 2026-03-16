@@ -9,14 +9,14 @@ declare(strict_types=1);
 
 <div class="my-3 p-3 bg-body rounded shadow-sm">
 
-    <h6 class="border-bottom pb-2 mb-3">Detected parameters</h6>
+    <h6 class="border-bottom pb-2 mb-3"><?= $view->e($view->t('parameters.title')) ?></h6>
 
     <div class="search-wrapper mb-3">
         <input
             id="paramSearch"
             type="text"
             class="form-control"
-            placeholder="Search parameter, field or value..."
+            placeholder="<?= $view->e($view->t('parameters.search_placeholder')) ?>"
         >
     </div>
 
@@ -26,11 +26,11 @@ declare(strict_types=1);
 
             <thead class="table-dark">
             <tr>
-                <th style="width:80px">Column</th>
-                <th style="width:260px">Parameter</th>
-                <th style="width:150px">Field</th>
-                <th style="width:120px">Values</th>
-                <th>Available values</th>
+                <th style="width:80px"><?= $view->e($view->t('parameters.column')) ?></th>
+                <th style="width:260px"><?= $view->e($view->t('parameters.parameter')) ?></th>
+                <th style="width:150px"><?= $view->e($view->t('parameters.field')) ?></th>
+                <th style="width:120px"><?= $view->e($view->t('parameters.values')) ?></th>
+                <th><?= $view->e($view->t('parameters.available_values')) ?></th>
             </tr>
             </thead>
 
@@ -90,7 +90,12 @@ declare(strict_types=1);
 
             <tr id="noResultsRow" data-row="empty" class="d-none">
                 <td colspan="5" class="text-center text-muted">
-                    <p class="alert alert-light">No parameters found for "<span id="searchTerm"></span>"</p>
+
+                    <p class="alert alert-light"
+                       id="noResultsText"
+                       data-template="<?= $view->e($view->t('parameters.no_results', '%s')) ?>">
+                    </p>
+
                 </td>
             </tr>
 

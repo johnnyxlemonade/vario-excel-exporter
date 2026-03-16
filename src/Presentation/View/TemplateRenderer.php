@@ -6,38 +6,50 @@ namespace App\Presentation\View;
 
 use App\Infrastructure\Time\Clock;
 use App\Presentation\Html\HtmlMinifier;
+use RuntimeException;
 
 final class TemplateRenderer
 {
     public function __construct(
         private readonly string $templateDir,
         private readonly Clock $clock,
-        private readonly ?HtmlMinifier $minifier = null
+        private readonly HtmlMinifier $minifier,
+        private readonly Translator $translator
     ) {}
 
     /**
      * @param array<string,mixed> $data
+     * @throws \Throwable
      */
     public function render(string $template, array $data = []): string
     {
         ob_start();
-        $this->includeTemplate($template, $data);
 
-        $html = (string) ob_get_clean();
+        try {
+            $this->includeTemplate($template, $data);
 
-        if ($this->minifier !== null) {
-            $html = $this->minifier->minify($html);
+            $html = ob_get_clean();
+
+            if (!is_string($html)) {
+                throw new RuntimeException('Template output buffer did not return string.');
+            }
+
+            return $this->minifier->minify($html);
+
+        } catch (\Throwable $e) {
+            ob_end_clean();
+            throw $e;
         }
-
-        return $html;
     }
 
-    /**
-     * @param array<string,mixed> $data
-     */
-    public function display(string $template, array $data = []): void
+    public function t(string $key, mixed ...$params): string
     {
-        echo $this->render($template, $data);
+        return $this->translator->t($key, ...$params);
+    }
+
+    public function locale(): string
+    {
+        return $this->translator->locale();
     }
 
     /**
@@ -59,7 +71,7 @@ final class TemplateRenderer
             return '';
         }
 
-        return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+        return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     }
 
     /**
@@ -70,7 +82,7 @@ final class TemplateRenderer
         $file = rtrim($this->templateDir, '/\\') . '/' . ltrim($template, '/\\') . '.php';
 
         if (!is_file($file)) {
-            throw new \RuntimeException("Template not found: {$file}");
+            throw new RuntimeException("Template not found: {$file}");
         }
 
         $view = $this;

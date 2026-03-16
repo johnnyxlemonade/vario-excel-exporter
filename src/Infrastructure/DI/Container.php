@@ -8,7 +8,6 @@ use App\Application\ExportService;
 use App\Application\ParameterAnalyzer;
 use App\Application\ParameterProcessor;
 use App\Application\ParameterRepository;
-use App\Domain\Filter\Filter;
 use App\Domain\Filter\FilterCollection;
 use App\Domain\Filter\FilterExportConfig;
 use App\Domain\Filter\ProductFilterExportConfig;
@@ -28,10 +27,13 @@ use App\Infrastructure\Time\Clock;
 use App\Presentation\Html\HtmlMinifier;
 use App\Presentation\View\ParameterReportRenderer;
 use App\Presentation\View\TemplateRenderer;
+use App\Presentation\View\Translator;
 
 final class Container
 {
     private const TEMPLATE_DIR = __DIR__ . '/../../../templates';
+
+    private const LANG_DIR = __DIR__ . '/../../../lang';
 
     /** @var array<string,object> */
     private array $instances = [];
@@ -62,10 +64,16 @@ final class Container
 
             HtmlMinifier::class => fn(self $c) => new HtmlMinifier(),
 
+            Translator::class => fn(self $c) => new Translator(
+                locale: 'en',
+                messages: self::loadMessages('en')
+            ),
+
             TemplateRenderer::class => fn(self $c) => new TemplateRenderer(
                 templateDir: self::TEMPLATE_DIR,
                 clock: $c->getClock(),
-                minifier: $c->getHtmlMinifier()
+                minifier: $c->getHtmlMinifier(),
+                translator: $c->getTranslator()
             ),
 
             ParameterReportRenderer::class => fn(self $c) =>
@@ -258,5 +266,31 @@ final class Container
     public function getExportService(): ExportService
     {
         return $this->service(ExportService::class);
+    }
+
+    public function getTranslator(): Translator
+    {
+        return $this->service(Translator::class);
+    }
+
+    /**
+     * @return array<string,string>
+     */
+    private static function loadMessages(string $locale): array
+    {
+        $file = self::LANG_DIR . '/' . $locale . '.php';
+
+        if (!is_file($file)) {
+            throw new \RuntimeException("Language file not found: {$file}");
+        }
+
+        $messages = require $file;
+
+        if (!is_array($messages)) {
+            throw new \RuntimeException('Language file must return array.');
+        }
+
+        /** @var array<string,string> $messages */
+        return $messages;
     }
 }

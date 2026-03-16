@@ -24,7 +24,7 @@ declare(strict_types=1);
 ?>
 
 <!DOCTYPE html>
-<html lang="en" class="no-js msie app-webp">
+<html lang="<?= $view->e($view->locale()) ?>" class="no-js msie app-webp">
 
 <head itemscope itemtype="https://schema.org/WebSite">
 
@@ -35,8 +35,9 @@ declare(strict_types=1);
     <meta name="generator" content="Lemonade CMS [lemonadeframework.cz]">
     <meta name="rating" content="General">
     <meta name="web_author" content="lemonadeframework.cz">
+    <meta http-equiv="content-language" content="<?= $view->e($view->locale()) ?>">
 
-    <title>Product Parameter Analyzer</title>
+    <title><?= $view->e($view->t('app.title')) ?></title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.lemonadeframework.cz/fonts/fontawesome/webfont.css">
@@ -86,8 +87,8 @@ declare(strict_types=1);
 
     <?php
     $view->partial('partials/header', [
-        'title' => 'Product Parameter Analyzer',
-        'subtitle' => 'KvalitníTeplo · Seyfor Vario'
+        'title' => $view->t('app.title'),
+        'subtitle' => $view->t('app.subtitle')
     ]);
 
     $view->partial('partials/dataset_overview', [

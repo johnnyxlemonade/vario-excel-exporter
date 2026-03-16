@@ -15,8 +15,10 @@
         if (!searchInput) return;
 
         const rows = document.querySelectorAll('#paramTable tbody tr[data-row="filterable"]');
+
         const noResultsRow = document.getElementById('noResultsRow');
-        const searchTerm = document.getElementById('searchTerm');
+        const noResultsText = document.getElementById('noResultsText');
+        const template = noResultsText ? noResultsText.dataset.template : null;
 
         const filter = () => {
 
@@ -35,11 +37,17 @@
 
             });
 
-            if (visible === 0 && query !== '') {
+            if (visible === 0 && query !== '' && template) {
+
                 noResultsRow.classList.remove('d-none');
-                searchTerm.textContent = searchInput.value.trim();
+
+                const message = template.replace('%s', searchInput.value.trim());
+                noResultsText.textContent = message;
+
             } else {
+
                 noResultsRow.classList.add('d-none');
+
             }
 
         };
