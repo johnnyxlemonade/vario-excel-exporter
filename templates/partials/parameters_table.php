@@ -36,14 +36,23 @@ declare(strict_types=1);
 
             <tbody class="table-group-divider">
 
-            <?php foreach ($parameters as $parameter) : ?>
+            <?php
+            $lastIndex = count($parameters) - 1;
+            ?>
+
+            <?php foreach ($parameters as $i => $parameter) : ?>
 
                 <?php
                 $values = $parameter->getValues();
                 sort($values);
+
+                $isLast = $i === $lastIndex;
                 ?>
 
-                <tr>
+                <tr
+                    data-row="filterable"
+                    class="<?= $isLast ? 'is-last-filterable' : 'is-not-last-filterable' ?>"
+                >
 
                     <td class="text-muted">
                         <?= $parameter->getIndex() ?>
@@ -78,6 +87,12 @@ declare(strict_types=1);
                 </tr>
 
             <?php endforeach; ?>
+
+            <tr id="noResultsRow" data-row="empty" class="d-none">
+                <td colspan="5" class="text-center text-muted">
+                    <p class="alert alert-light">No parameters found for "<span id="searchTerm"></span>"</p>
+                </td>
+            </tr>
 
             </tbody>
         </table>

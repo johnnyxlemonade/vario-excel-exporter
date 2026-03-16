@@ -42,12 +42,40 @@ declare(strict_types=1);
     <link rel="stylesheet" href="https://cdn.lemonadeframework.cz/fonts/fontawesome/webfont.css">
 
     <style>
-        body{background:#f5f6f8;}
-        .value-list{display:flex;flex-wrap:wrap;gap:4px;}
-        .value-badge{font-size:.75rem;}
-        .param-name{font-weight:500;}
-        #paramTable tbody tr:last-child td,
-        #paramTable tbody tr:last-child th{border-bottom:0;}
+        body { background:#f5f6f8; }
+
+        .value-list {
+            display:flex;
+            flex-wrap:wrap;
+            gap:4px;
+        }
+
+        .value-badge {
+            font-size:.75rem;
+        }
+
+        .param-name {
+            font-weight:500;
+        }
+
+        #paramTable > tbody > tr.is-last-filterable > td,
+        #paramTable > tbody > tr.is-last-filterable > th {
+            border-bottom:0 !important;
+        }
+
+        #paramTable > tbody > tr#noResultsRow > td {
+            border-bottom:0 !important;
+            padding:0.5rem 0 !important;
+        }
+
+        #paramTable > tbody > tr#noResultsRow .alert {
+            margin:0;
+        }
+
+        #searchTerm {
+            font-weight: bold;
+        }
+
     </style>
 
 </head>

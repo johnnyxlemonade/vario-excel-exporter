@@ -39,7 +39,10 @@ final class ParameterSnapshotLoader
 
             /** @var list<string> $values */
             $values = array_values(
-                array_filter($values, static fn($v) => is_string($v))
+                array_map(
+                    static fn($v) => (string) $v,
+                    array_filter($values, static fn($v) => is_scalar($v))
+                )
             );
 
             $parameters[] = new Parameter(

@@ -83,8 +83,8 @@ foreach ($parameters as $p) {
 
         <div class="mb-3">
 
-            <small class="text-muted d-block mb-1">
-                Ignored parameters
+            <small class="text-muted d-block mb-2">
+                <strong>Ignored parameters:</strong> Click on a parameter to toggle its visibility and include it in the analysis.
             </small>
 
             <div class="value-list">
@@ -118,13 +118,9 @@ foreach ($parameters as $p) {
                     ?>
 
                     <a href="<?= $view->e($url) ?>" class="text-decoration-none">
-
-<span class="badge <?= $class ?> value-badge">
-
-<?= $view->e($filter->getName()) ?>
-
-</span>
-
+                        <span class="badge <?= $class ?> value-badge"
+                              data-bs-toggle="tooltip"
+                              title="<?= $enabled ? 'Click to ignore' : 'Click to enable' ?>"><?= $view->e($filter->getName()) ?></span>
                     </a>
 
                 <?php endforeach; ?>
