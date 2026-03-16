@@ -138,6 +138,7 @@ Key components include:
     - Readonly properties
     - Constructor property promotion
     - Match expressions
+- **Multilingual UI & Data Mapping** – support for Czech and English translations, allowing technical slugs to be presented as human-readable labels. 
 
 ---
 
