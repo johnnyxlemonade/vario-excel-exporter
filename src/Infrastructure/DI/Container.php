@@ -83,14 +83,7 @@ final class Container
             ParameterSnapshotWriter::class => fn(self $c) =>
             new ParameterSnapshotWriter($c->getNdjsonWriter()),
 
-            FilterCollection::class => fn(self $c) => new FilterCollection([
-                new Filter('Hmotnost', 'weight'),
-                new Filter('Tloušťka', 'thickness'),
-                new Filter('Výška', 'height'),
-                new Filter('Šířka', 'width'),
-                new Filter('Délka', 'length'),
-                new Filter('Výrobce', 'manufacturer'),
-            ]),
+            FilterCollection::class => fn(self $c) => new FilterCollection([]),
 
             FilterExporter::class => fn(self $c) =>
             new FilterExporter(new FilterExportConfig('filter', 'value')),
@@ -140,6 +133,11 @@ final class Container
             ),
 
         ];
+    }
+
+    public function set(string $id, object $service): void
+    {
+        $this->instances[$id] = $service;
     }
 
     /**

@@ -5,12 +5,25 @@ declare(strict_types=1);
 use App\Application\ProcessRequest;
 use App\Domain\Export\ExportFormat;
 use App\Domain\Export\ExportType;
+use App\Domain\Filter\Filter;
+use App\Domain\Filter\FilterCollection;
 use App\Infrastructure\DI\Container;
 use App\Infrastructure\Http\QueryHelper;
 
 require 'vendor/autoload.php';
 
 $container = new Container();
+$container->set(
+    FilterCollection::class,
+    new FilterCollection([
+        new Filter('Hmotnost', 'weight'),
+        new Filter('Tloušťka', 'thickness'),
+        new Filter('Výška', 'height'),
+        new Filter('Šířka', 'width'),
+        new Filter('Délka', 'length'),
+        new Filter('Výrobce', 'manufacturer'),
+    ])
+);
 
 try {
 
