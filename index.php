@@ -7,27 +7,19 @@ use App\Domain\Export\ExportFormat;
 use App\Domain\Export\ExportType;
 use App\Domain\Filter\Filter;
 use App\Domain\Filter\FilterCollection;
-use App\Infrastructure\DI\Container;
+use App\Infrastructure\DI\ContainerFactory;
 use App\Infrastructure\Http\QueryHelper;
-use App\Presentation\View\Translator;
 
-require 'vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
-$container = new Container();
+$container = (new ContainerFactory())->create();
 
 $lang = QueryHelper::get('lang', 'en');
 $lang = in_array($lang, ['en', 'cs'], true) ? $lang : 'en';
 
-/** @var array<string,string> $messages */
-$messages = require __DIR__ . "/lang/$lang.php";
-
-$container->set(
-    Translator::class,
-    new Translator(
-        locale: $lang,
-        messages: $messages
-    )
-);
+$container = (new ContainerFactory())->create([
+    'lang' => $lang,
+]);
 
 $container->set(
     FilterCollection::class,
@@ -42,7 +34,6 @@ $container->set(
 );
 
 try {
-
     $request = new ProcessRequest(
         file: 'export_vlastnosti_produktu.xlsx',
         exportDirectory: 'exports',

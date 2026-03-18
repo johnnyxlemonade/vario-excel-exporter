@@ -54,13 +54,37 @@ Reusable parts include:
 - memory-safe file streaming via `php://output`
 - NDJSON snapshot persistence
 - strict PHPStan Level 10 compatible structure
-- simple pure‑PHP dependency injection container
+- lightweight compiled dependency injection container
 
 ---
 
 ## Key Takeaway
 
 The most valuable part of this project is the **streaming export pipeline**, which demonstrates how to process and export large datasets in constant memory using a simple push-based architecture.
+
+Equally important is the **compiled dependency injection container**, which showcases how a fully deterministic, reflection-free DI system can be implemented in pure PHP with strict validation and zero runtime service wiring.
+Together, these two parts highlight a design focused on:
+
+- performance and memory efficiency
+- explicit architecture without hidden magic
+- predictable behavior suitable for large-scale data processing
+
+---
+
+### Design goals
+
+The container intentionally avoids:
+
+- any form of autowiring
+- reflection-based service resolution
+- annotations or attributes
+- runtime magic
+
+Instead it favors:
+
+- explicit service definitions
+- static analysis friendliness (PHPStan level 10)
+- predictable compiled output
 
 ---
 
@@ -90,15 +114,6 @@ This keeps application logic decoupled from HTTP.
 The `ParameterRepository` together with snapshot helpers (`DatasetSnapshotLoader`, `DatasetSnapshotWriter`) hides the complexity of working with large datasets.
 
 It transparently handles **NDJSON snapshot persistence**, avoiding expensive Excel re‑parsing when the same dataset is analyzed repeatedly.
-
-### Custom DI Container
-
-A lightweight **pure PHP dependency injection container** provides:
-
-- strictly typed getters
-- zero reflection
-- zero runtime magic
-- predictable object lifecycle
 
 ### Streaming Export Pipeline
 
