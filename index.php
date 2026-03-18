@@ -12,8 +12,6 @@ use App\Infrastructure\Http\QueryHelper;
 
 require __DIR__ . '/vendor/autoload.php';
 
-$container = (new ContainerFactory())->create();
-
 $lang = QueryHelper::get('lang', 'en');
 $lang = in_array($lang, ['en', 'cs'], true) ? $lang : 'en';
 
