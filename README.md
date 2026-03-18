@@ -38,23 +38,29 @@ These exports can then be inspected or imported into the target system to verify
 
 The original Excel dataset used during development is included in this repository to demonstrate the analysis process.
 
-Although the application itself was built for a specific dataset, many parts of the codebase were intentionally designed to be **reusable and framework‑agnostic**.
+While the application itself is tailored to a specific dataset, it also demonstrates reusable patterns for working with large data exports.
 
-Several components can easily be reused in other PHP projects dealing with:
+Some components are intentionally designed in a reusable and framework‑agnostic way, especially for:
 
 - large data exports
 - streaming responses
 - memory‑efficient file processing
 - lightweight architecture experiments
 
-Reusable building blocks include:
+Reusable parts include:
 
 - streaming export pipeline (`RowWriter` abstraction)
 - CSV / TSV / JSON / XML / XLSX writers
 - memory-safe file streaming via `php://output`
 - NDJSON snapshot persistence
-- strict PHPStan Level 10 compatible architecture
+- strict PHPStan Level 10 compatible structure
 - simple pure‑PHP dependency injection container
+
+---
+
+## Key Takeaway
+
+The most valuable part of this project is the **streaming export pipeline**, which demonstrates how to process and export large datasets in constant memory using a simple push-based architecture.
 
 ---
 
@@ -62,16 +68,16 @@ Reusable building blocks include:
 
 This repository demonstrates how common PHP performance and architecture problems can be solved cleanly.
 
-### Clean Architecture
+### Architecture
 
-The project is structured into clear layers:
+The project follows a clean separation of responsibilities inspired by clean architecture principles:
 
 - **Application**
 - **Domain**
 - **Infrastructure**
 - **Presentation**
 
-Responsibilities are strictly separated and coordinated by lightweight application services such as **ParameterProcessor**, **ParameterAnalyzer**, and **ExportService**.
+Responsibilities are coordinated by lightweight application services such as **ParameterProcessor**, **ParameterAnalyzer**, and **ExportService**.
 
 ### Request Object Pattern
 
@@ -83,11 +89,11 @@ This keeps application logic decoupled from HTTP.
 
 The `ParameterRepository` together with snapshot helpers (`DatasetSnapshotLoader`, `DatasetSnapshotWriter`) hides the complexity of working with large datasets.
 
-It transparently handles **NDJSON snapshot persistence**, allowing the system to avoid expensive Excel re‑parsing when the same dataset is analyzed repeatedly.
+It transparently handles **NDJSON snapshot persistence**, avoiding expensive Excel re‑parsing when the same dataset is analyzed repeatedly.
 
 ### Custom DI Container
 
-A lightweight **Pure Dependency Injection Container** provides:
+A lightweight **pure PHP dependency injection container** provides:
 
 - strictly typed getters
 - zero reflection
@@ -100,7 +106,7 @@ Exporters push rows **directly to the output stream** instead of building files 
 
 This keeps memory usage constant regardless of dataset size.
 
-The export system is built around the `RowWriter` abstraction and implemented through multiple format‑specific writers created by `RowWriterFactory`.
+The export system is built around the `RowWriter` abstraction and implemented through format‑specific writers created by `RowWriterFactory`.
 
 ---
 
@@ -138,7 +144,7 @@ Key components include:
     - Readonly properties
     - Constructor property promotion
     - Match expressions
-- **Multilingual UI & Data Mapping** – support for Czech and English translations, allowing technical slugs to be presented as human-readable labels. 
+- **Multilingual UI & Data Mapping** – support for Czech and English translations, allowing technical slugs to be presented as human-readable labels.
 
 ---
 
