@@ -25,7 +25,7 @@ final class ContainerFactory
     /**
      * @param array<string, mixed> $parameters
      */
-    public function create(array $parameters = []): Container
+    public function create(array $parameters = []): ApplicationContainer
     {
         $className = $this->createClassName();
         $file = $this->createFilePath($className);
@@ -107,6 +107,7 @@ final class ContainerFactory
     {
         $files = [
             __FILE__,
+            __DIR__ . '/ApplicationContainer.php',
             __DIR__ . '/Container.php',
             __DIR__ . '/ContainerBuilder.php',
             __DIR__ . '/ContainerDumper.php',

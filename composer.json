@@ -22,6 +22,7 @@
   },
   "scripts": {
     "stan": "phpstan analyse",
+    "fix": "./vendor/bin/php-cs-fixer fix",
     "stan:ci": "phpstan analyse --no-progress --memory-limit=1G",
     "ci": [
       "@stan:ci"

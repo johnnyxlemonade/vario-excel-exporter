@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\DI;
 
-abstract class Container
+abstract class Container implements ApplicationContainer
 {
     /** @var array<string, object> */
     protected array $instances = [];
