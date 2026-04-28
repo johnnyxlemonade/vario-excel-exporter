@@ -71,7 +71,10 @@ class ParameterAnalyzer
             }
 
             $label = $labels[$i] ?? null;
-            $name = is_scalar($label) ? trim((string) $label, '(){} ') : '';
+
+            $name = is_scalar($label)
+                ? $this->normalizeLabel((string) $label)
+                : '';
 
             $ignored = isset($this->ignoreMap[$name]);
             $enabled = isset($this->enabledMap[$name]);
@@ -117,5 +120,16 @@ class ParameterAnalyzer
         }
 
         return $result;
+    }
+
+    private function normalizeLabel(string $label): string
+    {
+        $label = trim($label);
+
+        if (preg_match('/^\(\{(.+)\}\)$/u', $label, $matches) === 1) {
+            return trim($matches[1]);
+        }
+
+        return $label;
     }
 }
