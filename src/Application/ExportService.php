@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application;
 
+use App\Dataset\DatasetDefinition;
 use App\Domain\Export\ExportFormat;
 use App\Domain\Parameter\Parameter;
 use App\Export\ExportPaths;
@@ -25,7 +26,8 @@ final class ExportService
         private readonly FileDownloader $downloader,
         private readonly Clock $clock,
         private readonly ParameterAnalyzer $analyzer,
-        private readonly FileHasher $hasher
+        private readonly FileHasher $hasher,
+        private readonly DatasetDefinition $dataset,
     ) {}
 
     /**
@@ -106,8 +108,9 @@ final class ExportService
     ): never {
 
         $filename = sprintf(
-            '%s_%s_%s.%s',
+            '%s_%s_%s_%s.%s',
             $prefix,
+            $this->dataset->filenameSuffix(),
             $paths->getHash(),
             $this->clock->exportTimestamp(),
             $format->value

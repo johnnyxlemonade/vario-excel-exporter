@@ -29,45 +29,74 @@ final class ParameterReportRenderer
         ExportPaths $paths,
         string $sourceFile
     ): string {
-
         $hash = $paths->getHash();
         $token = time();
 
-        /** @var array{
-         *     parameters: list<Parameter>,
-         *     filters: list<Filter>,
-         *     filtersCsv: non-falsy-string,
-         *     filtersJson: non-falsy-string,
-         *     filtersXlsx: non-falsy-string,
-         *     filtersXml: non-falsy-string,
-         *     filtersTsv: non-falsy-string,
-         *     mappingCsv: non-falsy-string,
-         *     mappingJson: non-falsy-string,
-         *     mappingXlsx: non-falsy-string,
-         *     mappingXml: non-falsy-string,
-         *     mappingTsv: non-falsy-string,
-         *     dataset: DatasetDefinition,
-         *     datasets: list<DatasetDefinition>,
-         *     datasetHash: string,
-         *     sourceFile: string,
-         *     fileName: string
-         * } $data
-         */
         $data = [
             'parameters' => $parameters,
             'filters' => $filters,
 
-            'filtersCsv'  => '?download=filters&format=' . ExportFormat::CSV->value . "&_v={$hash}&_t={$token}",
-            'filtersJson' => '?download=filters&format=' . ExportFormat::JSON->value . "&_v={$hash}&_t={$token}",
-            'filtersXlsx' => '?download=filters&format=' . ExportFormat::XLSX->value . "&_v={$hash}&_t={$token}",
-            'filtersXml'  => '?download=filters&format=' . ExportFormat::XML->value . "&_v={$hash}&_t={$token}",
-            'filtersTsv'  => '?download=filters&format=' . ExportFormat::TSV->value . "&_v={$hash}&_t={$token}",
+            'filtersCsv' => $this->buildExportUrl(
+                download: 'filters',
+                format: ExportFormat::CSV,
+                hash: $hash,
+                token: $token,
+            ),
+            'filtersJson' => $this->buildExportUrl(
+                download: 'filters',
+                format: ExportFormat::JSON,
+                hash: $hash,
+                token: $token,
+            ),
+            'filtersXlsx' => $this->buildExportUrl(
+                download: 'filters',
+                format: ExportFormat::XLSX,
+                hash: $hash,
+                token: $token,
+            ),
+            'filtersXml' => $this->buildExportUrl(
+                download: 'filters',
+                format: ExportFormat::XML,
+                hash: $hash,
+                token: $token,
+            ),
+            'filtersTsv' => $this->buildExportUrl(
+                download: 'filters',
+                format: ExportFormat::TSV,
+                hash: $hash,
+                token: $token,
+            ),
 
-            'mappingCsv'  => '?download=mapping&format=' . ExportFormat::CSV->value . "&_v={$hash}&_t={$token}",
-            'mappingJson' => '?download=mapping&format=' . ExportFormat::JSON->value . "&_v={$hash}&_t={$token}",
-            'mappingXlsx' => '?download=mapping&format=' . ExportFormat::XLSX->value . "&_v={$hash}&_t={$token}",
-            'mappingXml'  => '?download=mapping&format=' . ExportFormat::XML->value . "&_v={$hash}&_t={$token}",
-            'mappingTsv'  => '?download=mapping&format=' . ExportFormat::TSV->value . "&_v={$hash}&_t={$token}",
+            'mappingCsv' => $this->buildExportUrl(
+                download: 'mapping',
+                format: ExportFormat::CSV,
+                hash: $hash,
+                token: $token,
+            ),
+            'mappingJson' => $this->buildExportUrl(
+                download: 'mapping',
+                format: ExportFormat::JSON,
+                hash: $hash,
+                token: $token,
+            ),
+            'mappingXlsx' => $this->buildExportUrl(
+                download: 'mapping',
+                format: ExportFormat::XLSX,
+                hash: $hash,
+                token: $token,
+            ),
+            'mappingXml' => $this->buildExportUrl(
+                download: 'mapping',
+                format: ExportFormat::XML,
+                hash: $hash,
+                token: $token,
+            ),
+            'mappingTsv' => $this->buildExportUrl(
+                download: 'mapping',
+                format: ExportFormat::TSV,
+                hash: $hash,
+                token: $token,
+            ),
 
             'dataset' => $this->dataset,
             'datasets' => $this->datasets->all(),
@@ -78,5 +107,21 @@ final class ParameterReportRenderer
         ];
 
         return $this->templates->render('report', $data);
+    }
+
+    private function buildExportUrl(
+        string $download,
+        ExportFormat $format,
+        string $hash,
+        int $token,
+    ): string {
+        return '?' . http_build_query([
+                'lang' => $this->templates->locale(),
+                'dataset' => $this->dataset->key(),
+                'download' => $download,
+                'format' => $format->value,
+                '_v' => $hash,
+                '_t' => $token,
+            ]);
     }
 }

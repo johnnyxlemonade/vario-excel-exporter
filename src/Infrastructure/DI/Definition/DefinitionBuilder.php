@@ -200,6 +200,7 @@ final class DefinitionBuilder
                                         new Argument(new ScalarValue('dataset.current'), 'labelKey'),
                                         new Argument(new ScalarValue('assets/datasets/export_vlastnosti_produktu_20260624.xlsx'), 'file'),
                                         new Argument(new ScalarValue('exports/current'), 'exportDirectory'),
+                                        new Argument(new ScalarValue('20260624'), 'filenameSuffix'),
                                     ]
                                 ),
                                 new NewInstance(
@@ -209,6 +210,7 @@ final class DefinitionBuilder
                                         new Argument(new ScalarValue('dataset.original'), 'labelKey'),
                                         new Argument(new ScalarValue('assets/datasets/export_vlastnosti_produktu.xlsx'), 'file'),
                                         new Argument(new ScalarValue('exports/original'), 'exportDirectory'),
+                                        new Argument(new ScalarValue('original'), 'filenameSuffix'),
                                     ]
                                 ),
                             ])
@@ -330,6 +332,7 @@ final class DefinitionBuilder
                         new Argument(new Reference(Clock::class), 'clock'),
                         new Argument(new Reference(ParameterAnalyzer::class), 'analyzer'),
                         new Argument(new Reference(FileHasher::class), 'hasher'),
+                        new Argument(new Reference(DatasetDefinition::class), 'dataset'),
                     ]
                 ),
             ),

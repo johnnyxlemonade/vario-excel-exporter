@@ -11,6 +11,7 @@ final class DatasetDefinition
         private readonly string $labelKey,
         private readonly string $file,
         private readonly string $exportDirectory,
+        private readonly string $filenameSuffix,
     ) {}
 
     public function key(): string
@@ -31,5 +32,10 @@ final class DatasetDefinition
     public function exportDirectory(): string
     {
         return $this->exportDirectory;
+    }
+
+    public function filenameSuffix(): string
+    {
+        return $this->filenameSuffix;
     }
 }
