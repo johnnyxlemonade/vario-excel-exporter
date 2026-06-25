@@ -16,6 +16,9 @@ final class ContainerFactory
     private const GENERATED_NAMESPACE = 'App\\Infrastructure\\DI\\Generated';
     private const TEMPLATE_DIR = __DIR__ . '/../../../templates';
     private const LANG_DIR = __DIR__ . '/../../../lang';
+    private const DATASET_DIR = __DIR__ . '/../../../src/Dataset';
+    private const APPLICATION_DIR = __DIR__ . '/../../../src/Application';
+    private const PRESENTATION_DIR = __DIR__ . '/../../../src/Presentation';
 
     public function __construct(
         private readonly ContainerBuilder $builder = new ContainerBuilder(),
@@ -130,7 +133,8 @@ final class ContainerFactory
             // Builder
             __DIR__ . '/Definition/DefinitionBuilder.php',
 
-            // config
+            // Config
+            __DIR__ . '/../../../composer.json',
             __DIR__ . '/../../../composer.lock',
         ];
 
@@ -147,6 +151,9 @@ final class ContainerFactory
 
         $this->addDirectoryToHash($ctx, self::LANG_DIR);
         $this->addDirectoryToHash($ctx, self::TEMPLATE_DIR);
+        $this->addDirectoryToHash($ctx, self::DATASET_DIR);
+        $this->addDirectoryToHash($ctx, self::APPLICATION_DIR);
+        $this->addDirectoryToHash($ctx, self::PRESENTATION_DIR);
 
         return substr(hash_final($ctx), 0, 16);
     }
