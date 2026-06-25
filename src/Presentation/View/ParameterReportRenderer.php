@@ -41,30 +41,35 @@ final class ParameterReportRenderer
                 format: ExportFormat::CSV,
                 hash: $hash,
                 token: $token,
+                filters: $filters,
             ),
             'filtersJson' => $this->buildExportUrl(
                 download: 'filters',
                 format: ExportFormat::JSON,
                 hash: $hash,
                 token: $token,
+                filters: $filters,
             ),
             'filtersXlsx' => $this->buildExportUrl(
                 download: 'filters',
                 format: ExportFormat::XLSX,
                 hash: $hash,
                 token: $token,
+                filters: $filters,
             ),
             'filtersXml' => $this->buildExportUrl(
                 download: 'filters',
                 format: ExportFormat::XML,
                 hash: $hash,
                 token: $token,
+                filters: $filters,
             ),
             'filtersTsv' => $this->buildExportUrl(
                 download: 'filters',
                 format: ExportFormat::TSV,
                 hash: $hash,
                 token: $token,
+                filters: $filters,
             ),
 
             'mappingCsv' => $this->buildExportUrl(
@@ -72,30 +77,35 @@ final class ParameterReportRenderer
                 format: ExportFormat::CSV,
                 hash: $hash,
                 token: $token,
+                filters: $filters,
             ),
             'mappingJson' => $this->buildExportUrl(
                 download: 'mapping',
                 format: ExportFormat::JSON,
                 hash: $hash,
                 token: $token,
+                filters: $filters,
             ),
             'mappingXlsx' => $this->buildExportUrl(
                 download: 'mapping',
                 format: ExportFormat::XLSX,
                 hash: $hash,
                 token: $token,
+                filters: $filters,
             ),
             'mappingXml' => $this->buildExportUrl(
                 download: 'mapping',
                 format: ExportFormat::XML,
                 hash: $hash,
                 token: $token,
+                filters: $filters,
             ),
             'mappingTsv' => $this->buildExportUrl(
                 download: 'mapping',
                 format: ExportFormat::TSV,
                 hash: $hash,
                 token: $token,
+                filters: $filters,
             ),
 
             'dataset' => $this->dataset,
@@ -109,19 +119,33 @@ final class ParameterReportRenderer
         return $this->templates->render('report', $data);
     }
 
+    /**
+     * @param list<Filter> $filters
+     */
     private function buildExportUrl(
         string $download,
         ExportFormat $format,
         string $hash,
         int $token,
+        array $filters,
     ): string {
-        return '?' . http_build_query([
-                'lang' => $this->templates->locale(),
-                'dataset' => $this->dataset->key(),
-                'download' => $download,
-                'format' => $format->value,
-                '_v' => $hash,
-                '_t' => $token,
-            ]);
+        $query = [
+            'lang' => $this->templates->locale(),
+            'dataset' => $this->dataset->key(),
+            'download' => $download,
+            'format' => $format->value,
+            '_v' => $hash,
+            '_t' => $token,
+        ];
+
+        foreach ($filters as $filter) {
+            if (!$filter->isEnabled()) {
+                continue;
+            }
+
+            $query[$filter->getSlug()] = '1';
+        }
+
+        return '?' . http_build_query($query);
     }
 }
