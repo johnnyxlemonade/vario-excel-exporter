@@ -121,3 +121,4 @@ docker-compose.override.yml
 /download
 .php-cs-fixer.cache
 t.php
+*.csv
