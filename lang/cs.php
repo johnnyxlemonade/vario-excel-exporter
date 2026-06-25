@@ -20,6 +20,10 @@ return [
     'dataset.download_filters' => 'Stáhnout filtry',
     'dataset.download_mapping' => 'Stáhnout mapování produktů',
 
+    'dataset.title' => 'Dataset',
+    'dataset.current' => 'Aktuální export',
+    'dataset.original' => 'Původní export',
+
     'parameters.title' => 'Přehled parametrů',
     'parameters.search_placeholder' => 'Hledat parametr, pole nebo hodnotu...',
     'parameters.column' => 'Sloupec',

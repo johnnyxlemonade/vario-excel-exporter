@@ -13,6 +13,15 @@ final class NdjsonWriter
      */
     public function write(iterable $rows, string $file): void
     {
+        $directory = dirname($file);
+
+        if (!is_dir($directory) && !mkdir($directory, 0777, true) && !is_dir($directory)) {
+            throw new RuntimeException(sprintf(
+                'Cannot create NDJSON directory: %s',
+                $directory
+            ));
+        }
+
         $handle = fopen($file, 'w');
 
         if ($handle === false) {

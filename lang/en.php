@@ -20,6 +20,10 @@ return [
     'dataset.download_filters' => 'Download filters',
     'dataset.download_mapping' => 'Download product mapping',
 
+    'dataset.title' => 'Dataset',
+    'dataset.current' => 'Current export',
+    'dataset.original' => 'Original export',
+
     'parameters.title' => 'Parameters overview',
     'parameters.search_placeholder' => 'Search parameter, field or value...',
     'parameters.column' => 'Column',

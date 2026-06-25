@@ -5,6 +5,8 @@ declare(strict_types=1);
 /** @var \App\Presentation\View\TemplateRenderer $view */
 /** @var list<\App\Domain\Parameter\Parameter> $parameters */
 /** @var list<\App\Domain\Filter\Filter> $filters */
+/** @var \App\Dataset\DatasetDefinition $dataset */
+/** @var list<\App\Dataset\DatasetDefinition> $datasets */
 /** @var string $sourceFile */
 /** @var string $fileName */
 /** @var string $datasetHash */
@@ -77,6 +79,94 @@ declare(strict_types=1);
             font-weight: bold;
         }
 
+        .app-card {
+            border: 0;
+            border-radius: 14px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, .06);
+        }
+
+        .app-section-title {
+            font-size: .78rem;
+            font-weight: 700;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            color: #6c757d;
+        }
+
+        .app-button-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .375rem;
+        }
+
+        .app-button-row .btn {
+            min-width: 74px;
+            font-weight: 600;
+        }
+
+        .dataset-switcher .btn {
+            min-width: 140px;
+        }
+
+        .dataset-switcher .btn.active {
+            pointer-events: none;
+        }
+
+        .export-group {
+            display: flex;
+            flex-direction: column;
+            gap: .5rem;
+        }
+
+        .export-group-title {
+            font-size: .82rem;
+            font-weight: 700;
+            color: #495057;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: .75rem;
+        }
+
+        .meta-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: .75rem .875rem;
+        }
+
+        .meta-label {
+            display: block;
+            font-size: .72rem;
+            font-weight: 700;
+            letter-spacing: .03em;
+            text-transform: uppercase;
+            color: #6c757d;
+            margin-bottom: .2rem;
+        }
+
+        .meta-value {
+            font-weight: 700;
+            color: #212529;
+        }
+
+        @media (max-width: 991.98px) {
+            .meta-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .meta-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dataset-switcher .btn,
+            .app-button-row .btn {
+                flex: 1 1 auto;
+            }
+        }
     </style>
 
 </head>
@@ -89,6 +179,11 @@ declare(strict_types=1);
     $view->partial('partials/header', [
         'title' => $view->t('app.title'),
         'subtitle' => $view->t('app.subtitle')
+    ]);
+
+    $view->partial('partials/dataset_switcher', [
+        'dataset' => $dataset,
+        'datasets' => $datasets,
     ]);
 
     $view->partial('partials/dataset_overview', [

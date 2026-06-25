@@ -9,6 +9,9 @@ use App\Application\ParameterAnalyzer;
 use App\Application\ParameterAnalyzerFactory;
 use App\Application\ParameterProcessor;
 use App\Application\ParameterRepository;
+use App\Dataset\DatasetCollection;
+use App\Dataset\DatasetDefinition;
+use App\Dataset\DatasetResolver;
 use App\Domain\Filter\FilterCollection;
 use App\Domain\Filter\FilterExportConfig;
 use App\Domain\Filter\ProductFilterExportConfig;
@@ -113,7 +116,9 @@ final class DefinitionBuilder
                 factory: new NewInstance(
                     ParameterReportRenderer::class,
                     [
-                        new Argument(new Reference(TemplateRenderer::class)),
+                        new Argument(new Reference(TemplateRenderer::class), 'templates'),
+                        new Argument(new Reference(DatasetDefinition::class), 'dataset'),
+                        new Argument(new Reference(DatasetCollection::class), 'datasets'),
                     ]
                 ),
             ),
@@ -176,6 +181,64 @@ final class DefinitionBuilder
                     [
                         new Argument(new ArrayValue([])),
                     ]
+                ),
+            ),
+
+            new ServiceDefinition(
+                id: DatasetCollection::class,
+                returnType: DatasetCollection::class,
+                methodName: 'getDatasetCollection',
+                factory: new NewInstance(
+                    DatasetCollection::class,
+                    [
+                        new Argument(
+                            new ArrayValue([
+                                new NewInstance(
+                                    DatasetDefinition::class,
+                                    [
+                                        new Argument(new ScalarValue('current'), 'key'),
+                                        new Argument(new ScalarValue('dataset.current'), 'labelKey'),
+                                        new Argument(new ScalarValue('assets/datasets/export_vlastnosti_produktu_20260624.xlsx'), 'file'),
+                                        new Argument(new ScalarValue('exports/current'), 'exportDirectory'),
+                                    ]
+                                ),
+                                new NewInstance(
+                                    DatasetDefinition::class,
+                                    [
+                                        new Argument(new ScalarValue('original'), 'key'),
+                                        new Argument(new ScalarValue('dataset.original'), 'labelKey'),
+                                        new Argument(new ScalarValue('assets/datasets/export_vlastnosti_produktu.xlsx'), 'file'),
+                                        new Argument(new ScalarValue('exports/original'), 'exportDirectory'),
+                                    ]
+                                ),
+                            ])
+                        ),
+                    ]
+                ),
+            ),
+
+            new ServiceDefinition(
+                id: DatasetResolver::class,
+                returnType: DatasetResolver::class,
+                methodName: 'getDatasetResolver',
+                factory: new NewInstance(
+                    DatasetResolver::class,
+                    [
+                        new Argument(new Reference(DatasetCollection::class), 'datasets'),
+                    ]
+                ),
+            ),
+
+            new ServiceDefinition(
+                id: DatasetDefinition::class,
+                returnType: DatasetDefinition::class,
+                methodName: 'getDatasetDefinition',
+                factory: new MethodCall(
+                    target: new Reference(DatasetResolver::class),
+                    methodName: 'resolve',
+                    arguments: [
+                        new Argument(new Parameter('dataset')),
+                    ],
                 ),
             ),
 

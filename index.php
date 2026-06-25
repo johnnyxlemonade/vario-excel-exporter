@@ -17,7 +17,19 @@ $lang = in_array($lang, ['en', 'cs'], true) ? $lang : 'en';
 
 $container = (new ContainerFactory())->create([
     'lang' => $lang,
+    'dataset' => QueryHelper::get('dataset', 'current'),
 ]);
+
+$dataset = $container->getDatasetDefinition();
+
+$filePath = __DIR__ . '/' . $dataset->file();
+
+if (!is_file($filePath)) {
+    throw new RuntimeException(sprintf(
+        'Dataset file does not exist: %s',
+        $dataset->file()
+    ));
+}
 
 $container->set(
     FilterCollection::class,
@@ -33,8 +45,8 @@ $container->set(
 
 try {
     $request = new ProcessRequest(
-        file: 'export_vlastnosti_produktu.xlsx',
-        exportDirectory: 'exports',
+        file: $dataset->file(),
+        exportDirectory: $dataset->exportDirectory(),
         format: ExportFormat::fromString(
             QueryHelper::get('format', 'xlsx')
         ),
